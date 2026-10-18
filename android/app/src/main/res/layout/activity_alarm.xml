@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFF8E7"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="22dp"
+        android:gravity="center_horizontal">
+
+        <!-- 1. CABECERA BRUTALISTA: SELLO DE SISTEMA & RELOJ TÁCTICO -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" $ MICRIPTO SENTINEL "
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:background="@drawable/bg_brutalist_orange"
+                android:paddingStart="10dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="7dp"
+                android:paddingBottom="11dp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/alarmTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="09:18:00 BOT"
+                android:textColor="#0A0A0A"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:background="@drawable/bg_brutalist_white"
+                android:paddingStart="12dp"
+                android:paddingEnd="15dp"
+                android:paddingTop="7dp"
+                android:paddingBottom="11dp" />
+        </LinearLayout>
+
+        <!-- 2. BANNER DE ESTADO BRUTALISTA -->
+        <TextView
+            android:id="@+id/statusBadge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⚡ ¡ORDEN DE COMPRA EJECUTADA EN BINANCE!"
+            android:textColor="#0A0A0A"
+            android:textStyle="bold"
+            android:textSize="13sp"
+            android:fontFamily="monospace"
+            android:gravity="center"
+            android:background="@drawable/bg_status_badge"
+            android:paddingStart="14dp"
+            android:paddingEnd="18dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="16dp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="12dp" />
+
+        <!-- 3. TARJETA 1: FICHA DE ACTIVO EN GRILLA BRUTALISTA (BLANCO + ORO) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_tactical"
+            android:paddingStart="16dp"
+            android:paddingEnd="21dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="19dp">
+
+            <!-- Cabecera del Activo -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/assetSymbol"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="SUI / USDT"
+                    android:textColor="#0A0A0A"
+                    android:textStyle="bold"
+                    android:textSize="26sp"
+                    android:fontFamily="monospace" />
+
+                <TextView
+                    android:id="@+id/assetModeBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SPOT CASH"
+                    android:textColor="#0A0A0A"
+                    android:textStyle="bold"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:background="@drawable/bg_brutalist_cell_amber"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp" />
+            </LinearLayout>
+
+            <!-- Divisor Brutalista Sólido -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2.5dp"
+                android:background="#0A0A0A"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- Grilla de 2 Columnas: Precio y Posición -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false">
+
+                <!-- Celda Izquierda: Precio -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.45"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_brutalist_cell_amber"
+                    android:padding="10dp"
+                    android:layout_marginEnd="6dp">
+
+                    <TextView
+                        android:id="@+id/assetPriceLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PRECIO ENTRADA"
+                        android:textColor="#78350F"
+                        android:textStyle="bold"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:id="@+id/assetPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="$1.0020"
+                        android:textColor="#0A0A0A"
+                        android:textStyle="bold"
+                        android:textSize="18sp"
+                        android:fontFamily="monospace"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Celda Derecha: Volumen / Monto -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.55"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_brutalist_cell_white"
+                    android:padding="10dp"
+                    android:layout_marginStart="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CAPITAL / POSICIÓN"
+                        android:textColor="#9A3412"
+                        android:textStyle="bold"
+                        android:textSize="10sp"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:id="@+id/assetAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="149.7 SUI ($149.99 USDT)"
+                        android:textColor="#0A0A0A"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:fontFamily="monospace"
+                        android:layout_marginTop="5dp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="12dp" />
+
+        <!-- 4. TARJETA 2 (HERO): ORDEN TÁCTICA & PRECIO OBJETIVO (AMARILLO ORO + NARANJA FUEGO) -->
+        <LinearLayout
+            android:id="@+id/actionBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_action"
+            android:paddingStart="16dp"
+            android:paddingEnd="22dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="20dp">
+
+            <TextView
+                android:id="@+id/actionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="🎯 ACCIÓN TÁCTICA OBLIGATORIA EN BINANCE"
+                android:textColor="#FFD600"
+                android:background="#0A0A0A"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:layout_marginBottom="10dp" />
+
+            <TextView
+                android:id="@+id/actionInstruction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Colocar orden Limit Sell en Take Profit:"
+                android:textColor="#0A0A0A"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+            <!-- Bloque Gigante Naranja Dinero para el Precio Objetivo -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_brutalist_cell_orange"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/actionTargetPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$1.0650"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="32sp"
+                    android:fontFamily="monospace"
+                    android:letterSpacing="0.04" />
+            </LinearLayout>
+
+            <!-- Cinta Blanca de Retorno Neto -->
+            <TextView
+                android:id="@+id/actionProjectedProfit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="💰 Retorno Esperado: +$9.12 USDT (+6.08%)"
+                android:textColor="#0A0A0A"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:background="@drawable/bg_brutalist_cell_white"
+                android:padding="8dp" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="12dp" />
+
+        <!-- 5. TARJETA 3: MATRIZ DE TELEMETRÍA DE CAPITAL & BÓVEDA (SIEMPRE VISIBLE) -->
+        <LinearLayout
+            android:id="@+id/profitTelemetryBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_card_tactical"
+            android:paddingStart="16dp"
+            android:paddingEnd="21dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="17dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="💰 TELEMETRÍA DE CAPITAL &amp; BÓVEDA SPOT"
+                android:textColor="#0A0A0A"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:fontFamily="monospace" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="#0A0A0A"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Fila de 2 Celdas: Ganancia Trade + Ganancia Acumulada -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:baselineAligned="false"
+                android:layout_marginBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_brutalist_cell_amber"
+                    android:padding="8dp"
+                    android:layout_marginEnd="5dp">
+
+                    <TextView
+                        android:id="@+id/profitCurrentTradeLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BENEFICIO OPERACIÓN"
+                        android:textColor="#78350F"
+                        android:textStyle="bold"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:id="@+id/profitCurrentTrade"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+$9.12 USDT"
+                        android:textColor="#0A0A0A"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:fontFamily="monospace"
+                        android:layout_marginTop="3dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_brutalist_cell_amber"
+                    android:padding="8dp"
+                    android:layout_marginStart="5dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="GANANCIA ACUMULADA"
+                        android:textColor="#9A3412"
+                        android:textStyle="bold"
+                        android:textSize="9sp"
+                        android:fontFamily="monospace" />
+
+                    <TextView
+                        android:id="@+id/profitTotalAccumulated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+$41.56 USDT"
+                        android:textColor="#C2410C"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:fontFamily="monospace"
+                        android:layout_marginTop="3dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Fila Liquidez Disponible -->
+            <TextView
+                android:id="@+id/liquidCashAvailable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="💵 LIQUIDEZ SPOT DISPONIBLE: $345.84 USDT"
+                android:textColor="#0A0A0A"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:background="@drawable/bg_brutalist_cell_white"
+                android:padding="7dp" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="14dp" />
+
+        <!-- 6. CONSOLA DE ACCIÓN BRUTALISTA (NARANJA + AMARILLO + BLANCO) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Botón Primario: Abrir Binance Directo (Naranja Fuego) -->
+            <TextView
+                android:id="@+id/btnOpenBinance"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="🚀 ABRIR BINANCE DIRECTO"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/bg_brutalist_orange"
+                android:paddingBottom="4dp"
+                android:paddingEnd="4dp"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Fila Doble: Silenciar Alarma (50%) + Panel Sentinel (50%) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnSilence"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="🔕 SILENCIAR"
+                    android:textColor="#0A0A0A"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/bg_brutalist_yellow"
+                    android:paddingBottom="4dp"
+                    android:paddingEnd="4dp"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/btnOpenDashboard"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="📊 VER PANEL"
+                    android:textColor="#0A0A0A"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="@drawable/bg_brutalist_white"
+                    android:paddingBottom="4dp"
+                    android:paddingEnd="4dp"
+                    android:layout_marginStart="6dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 7. SELLO DE ALIANZA -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ALIANZA RICHARD &amp; KAI — PROTOCOLO ANTIGRAVITY"
+            android:textColor="#78350F"
+            android:textStyle="bold"
+            android:textSize="10sp"
+            android:fontFamily="monospace"
+            android:layout_marginTop="14dp" />
+
+    </LinearLayout>
+</ScrollView>

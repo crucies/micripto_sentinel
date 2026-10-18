@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Hard Brutalist Shadow -->
+    <item
+        android:left="5dp"
+        android:top="5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#0A0A0A" />
+        </shape>
+    </item>
+    <!-- Vibrant Money Orange Body -->
+    <item
+        android:bottom="5dp"
+        android:right="5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#FF5500" />
+            <stroke
+                android:width="3dp"
+                android:color="#0A0A0A" />
+        </shape>
+    </item>
+</layer-list>

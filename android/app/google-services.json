@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "371433077560",
+    "project_id": "micripto-sentinel",
+    "storage_bucket": "micripto-sentinel.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:371433077560:android:eb982f0c1cfbac93555fcd",
+        "android_client_info": {
+          "package_name": "com.richard.micripto.micripto_sentinel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXuEqkygZtxUKboMP-WXUsBqENHeSqtW0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
