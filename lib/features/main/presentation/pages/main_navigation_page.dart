@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
+import '../../../radar/presentation/pages/radar_s_plus_page.dart';
 import '../../../settings/presentation/pages/settings_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
@@ -15,6 +16,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
 
   final List<Widget> _pages = const [
     DashboardPage(),
+    RadarSPlusPage(),
     SettingsPage(),
   ];
 
@@ -28,7 +30,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
-          padding: const EdgeInsets.fromLTRB(22, 10, 22, 14),
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
           decoration: const BoxDecoration(
             color: AppColors.background,
             border: Border(
@@ -41,15 +43,26 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                 child: _buildBrutalistNavTab(
                   index: 0,
                   icon: Icons.candlestick_chart,
-                  label: 'INICIO SPOT',
+                  label: 'ÓRDENES',
+                  activeColor: AppColors.gold,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 10),
               Expanded(
                 child: _buildBrutalistNavTab(
                   index: 1,
+                  icon: Icons.radar,
+                  label: 'RADAR S+',
+                  activeColor: const Color(0xFF00E5FF),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _buildBrutalistNavTab(
+                  index: 2,
                   icon: Icons.tune,
-                  label: 'AJUSTES & LOGS',
+                  label: 'AJUSTES',
+                  activeColor: AppColors.gold,
                 ),
               ),
             ],
@@ -63,6 +76,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     required int index,
     required IconData icon,
     required String label,
+    required Color activeColor,
   }) {
     final bool isSelected = _currentIndex == index;
     return GestureDetector(
@@ -75,7 +89,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
         height: 48,
         decoration: isSelected
             ? AppColors.brutalistBox(
-                color: AppColors.gold,
+                color: activeColor,
                 borderWidth: 2.5,
                 shadowOffset: 4.0,
               )
@@ -88,18 +102,18 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           children: [
             Icon(
               icon,
-              size: 18,
+              size: 16,
               color: AppColors.ink,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 5),
             Text(
               label,
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-                fontSize: 12,
+                fontSize: 11,
                 color: AppColors.ink,
-                letterSpacing: 0.3,
+                letterSpacing: 0.2,
               ),
             ),
           ],
@@ -108,3 +122,4 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
     );
   }
 }
+

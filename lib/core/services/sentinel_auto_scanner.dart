@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import '../../features/orders/domain/order_entity.dart';
 import 'native_alarm_service.dart';
+import 'smc_s_plus_scanner.dart';
 
 class SentinelAutoScanner extends ChangeNotifier {
   static final SentinelAutoScanner instance = SentinelAutoScanner._internal();
@@ -22,7 +23,8 @@ class SentinelAutoScanner extends ChangeNotifier {
   bool _isSyncingCloud = false;
   String _lastScanTime = '--:--:--';
   String _lastCloudSyncTime = 'Pendiente';
-  String _statusMessage = '🟢 CENTINELA VIGILANDO: Auto-scan cada 25s';
+  String _statusMessage = '🟢 CENTINELA VIGILANDO: Auto-scan cada 25s + Radar S+ (3m)';
+  double _liquidCashUsdt = 0.91;
 
   Timer? _foregroundScanTimer;
   Timer? _cloudSyncTimer;
@@ -35,6 +37,12 @@ class SentinelAutoScanner extends ChangeNotifier {
   String get lastScanTime => _lastScanTime;
   String get lastCloudSyncTime => _lastCloudSyncTime;
   String get statusMessage => _statusMessage;
+  double get liquidCashUsdt => _liquidCashUsdt;
+
+  void setLiquidCash(double value) {
+    _liquidCashUsdt = value;
+    notifyListeners();
+  }
 
   double get totalExpectedReturn => _orders.fold(0.0, (sum, o) => sum + o.expectedReturnUsdt);
   double get totalProjectedProfit => _orders.fold(0.0, (sum, o) => sum + o.projectedProfitUsdt);
@@ -50,19 +58,22 @@ class SentinelAutoScanner extends ChangeNotifier {
     // 3. Ejecutar el primer escaneo de precios de Binance
     await scanBinancePrices();
 
-    // 4. Iniciar temporizador de escaneo en primer plano cada 25 segundos (100% automático)
+    // 4. Iniciar Radar Cuantitativo Smart Engine 2.2 (S+ 1H cada 3 minutos)
+    SmcSPlusScanner.instance.init();
+
+    // 5. Iniciar temporizador de escaneo en primer plano cada 25 segundos (100% automático)
     _foregroundScanTimer?.cancel();
     _foregroundScanTimer = Timer.periodic(const Duration(seconds: 25), (_) async {
       await scanBinancePrices();
     });
 
-    // 5. Iniciar temporizador de sincronización de órdenes con la nube cada 3 minutos
+    // 6. Iniciar temporizador de sincronización de órdenes con la nube cada 3 minutos
     _cloudSyncTimer?.cancel();
     _cloudSyncTimer = Timer.periodic(const Duration(minutes: 3), (_) async {
       await syncOrdersFromCloud();
     });
 
-    // 6. Activar Centinela Nativo de Fondo en Android (Despierta con AlarmClock en Doze Mode)
+    // 7. Activar Centinela Nativo de Fondo en Android (Despierta con AlarmClock en Doze Mode)
     await NativeAlarmService.startNativeBackgroundScan();
   }
 
@@ -91,6 +102,9 @@ class SentinelAutoScanner extends ChangeNotifier {
       final res = await http.get(Uri.parse(cloudOrdersUrl)).timeout(const Duration(seconds: 8));
       if (res.statusCode == 200) {
         final data = jsonDecode(res.body);
+        if (data['metrics'] != null && data['metrics']['liquidCashUsdt'] != null) {
+          _liquidCashUsdt = (data['metrics']['liquidCashUsdt'] as num).toDouble();
+        }
         if (data['success'] == true && data['orders'] is List) {
           final List<dynamic> rawOrders = data['orders'];
           if (rawOrders.isNotEmpty) {

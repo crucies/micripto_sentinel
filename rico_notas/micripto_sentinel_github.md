@@ -3,39 +3,32 @@
 ## Estado de Sincronización Remota
 - **Repositorio Remoto:** `https://github.com/crucies/micripto_sentinel.git`
 - **Rama:** `master`
-- **Versión Despachada:** `V.0.1.6`
-- **Fecha de Despacho:** 2026-10-18
+- **Rango de Sincronización:** `V.0.1.6 ➔ V.0.1.8`
+- **Versión Despachada Actual:** `V.0.1.8` (`0.1.8+9`)
+- **Fecha de Despacho:** 2026-10-20
 - **Anfitrión / Autores:** Richard Coronado & Kai (Protocolo Antigravity)
 
 ---
 
-## 📦 Resumen Consolidado de Cambios (V.0.1.6)
+## 📦 Resumen Consolidado de Cambios Acumulados (`V.0.1.6 ➔ V.0.1.8`)
 
-### 1. Sincronización Dinámica en la Nube con MiCripto LTS (Cero Recompilaciones):
-- **`SentinelAutoScanner.dart`:** Descarga automática de las órdenes vivas en Binance Spot desde `https://micripto-lts.vercel.app/api/orders`.
-- Cero necesidad de recompilar el APK ante nuevas operaciones de compra o venta en Binance: la plataforma web publica y la aplicación móvil actualiza su lista de vigilancia dinámicamente.
+### 1. Motor Cuantitativo `Smart Engine 2.2 (S+ >= 90%, 92.3% WR)` On-Device (`V.0.1.7` – `V.0.1.8`):
+- **Escáner Autónomo 1H en Flutter (`lib/core/services/smc_s_plus_scanner.dart`) y Kotlin Nativo (`SentinelAlarmReceiver.kt`):**
+  - Consulta directa cada **3 minutos** a `api.binance.com/api/v3/klines?interval=1h&limit=100` para los 10 activos institucionales (`RENDER`, `SUI`, `NEAR`, `PENDLE`, `XRP`, `ONDO`, `TAO`, `FET`, `ETH`, `BTC`), operando incluso en Doze Mode con pantalla bloqueada y sin depender de cron jobs externos en Vercel.
+- **Paridad Matemática 100% Web-Móvil (`smcEngine.ts` == `SmcSPlusScanner.dart` == `SentinelAlarmReceiver.kt`):**
+  - Detección fractal `lookback = 4`, descarte inmediato (`break`) si un Swing Low `1H` ya fue barrido en horas previas (evitando falsos positivos en pisos gastados como `TAO`), filtro de descuento $\ge 3.5\%$, confirmación `CHoCH` envolvente (`close > prevHigh`) y divergencia/sobreventa `RSI(14)`.
+- **Nueva Pestaña Central `RADAR S+` (`lib/features/radar/presentation/pages/radar_s_plus_page.dart`):**
+  - Jerarquía cromática institucional estricta: **$\ge 90\%$ (`GRADO S+`) en Celeste/Turquesa (`#00E5FF`)**, **$80\%–89\%$ (`GRADO S`) en Verde Esmeralda (`#10B981`)**, y **$70\%–79\%$ (`GRADO A`) en Ámbar/Oro (`#FFD600`)**.
+  - Ficha completa de ejecución **OCO en Binance** (`Suelo 1H`, `TP1 +3.0%`, `TP2 +5.5%`, `OCO SL Trigger -2.8%`, `OCO SL Limit -2.95%`) y botón de prueba física de bloqueo en 5s por moneda.
 
-### 2. Vigilancia Autónoma Binance Spot (Cero Clics Requeridos):
-- **Primer Plano:** Escaneo continuo cada **25 segundos** directo contra Binance Spot REST API.
-- **Segundo Plano (Pantalla Apagada):** Despertador de hardware nativo de Android mediante `SentinelAlarmReceiver.kt` y `AlarmManager.setAlarmClock` cada **60 segundos**, saltándose el modo Doze para garantizar el disparo sin intervención manual.
-- **Alarma Militar Inmediata:** Despertar físico de la pantalla con WakeLock al 100% de brillo y reproducción en bucle del Sonar Cuántico Institucional en el canal `USAGE_ALARM` al tocar el Take Profit.
+### 2. Sincronización de Saldo Libre Spot (`$0.91 USDT`) y Edición Táctil Directa (`V.0.1.8`):
+- **Sincronización Nube + Local:** El recuadro `SALDO LIBRE SPOT` refleja `$0.91 USDT` por defecto, se sincroniza con `metrics.liquidCashUsdt` desde `https://micripto-lts.vercel.app/api/orders` y permite edición manual instantánea con 1 toque sobre la tarjeta en el Dashboard.
+- **7 Órdenes Vivas en Binance Spot:** `SUI TP2 ($1.0540)`, `SUI TP1 ($1.0280)`, `RENDER TP2 ($1.8600)`, `PENDLE ($2.1900)`, `SUI Lote 1 ($1.0650)`, `XRP ($1.3580)` y `ONDO ($0.4880)`.
 
-### 3. Incorporación Oficial de las 6 Órdenes Spot (Dual RENDER):
-- **RENDER (TP1 Defensivo):** 56.88 RENDER @ $1.8330 (Retorno: $104.261 USDT, Ganancia: +$4.27 USDT)
-- **RENDER (TP2 Expansivo):** 56.88 RENDER @ $1.8600 (Retorno: $105.796 USDT, Ganancia: +$5.80 USDT)
-- **PENDLE:** 72.10 PENDLE @ $2.1900 (Retorno: $157.898 USDT, Ganancia: +$8.07 USDT)
-- **SUI:** 149.70 SUI @ $1.0650 (Retorno: $159.430 USDT, Ganancia: +$9.43 USDT)
-- **XRP:** 261.00 XRP @ $1.3580 (Retorno: $354.438 USDT, Ganancia: +$20.36 USDT)
-- **ONDO:** 1,091.20 ONDO @ $0.4880 (Retorno: $532.505 USDT, Ganancia: +$32.52 USDT)
-- Métricas consolidadas: **$1,414.33 USDT** de retorno esperado y **+$80.50 USDT** de beneficio neto proyectado.
+---
 
-### 4. 4 Mejoras Visuales Tácticas en la Interfaz:
-- **Barra de Progreso Táctica hacia el TP:** Indicador visual que sustituye la línea divisoria de cada tarjeta de moneda, midiendo el avance porcentual desde el precio de compra hasta el precio de venta en vivo.
-- **Meta de Ganancia Neta:** Reubicada en una línea inferior independiente dentro de la franja naranja con `FittedBox` y `maxLines: 1` para eliminar desbordes.
-- **"VER FICHA Y ABRIR BINANCE ➔":** Acción separada de la fecha y ubicada en su propia línea inferior de ancho completo con marco brutalista centrado.
-- **Capital en Juego & Saldo Libre:** Protegidos con `FittedBox` y `maxLines: 1`, impidiendo que dígitos sueltos salten a un segundo renglón.
+## 📜 Historial de Despachos Previos
 
-### 5. Arquitectura Neo-Brutalista y Gestión de Audio:
-- Paleta **Money Magnet** (`#FFF8E7`, `#FFFFFF`, `#FFD600`, `#FF5500`, `#0A0A0A`) con bordes sólidos de 2.5px y sombras duras sin difuminado.
-- Formularios nativos de pantalla bloqueada (`AlarmActivity.kt`) con distribución elástica y botones tácticos de apertura directa a Binance Spot.
-- Audio centralizado en `SentinelAudioManager.kt` con soporte para perfiles "Sonar Siempre" y "Respetar Modo Silencio".
+### Despacho `V.0.1.6` (2026-10-18)
+- **Sincronización Dinámica en la Nube con MiCripto LTS (`SentinelAutoScanner.dart`):** Descarga automática de órdenes vivas desde `https://micripto-lts.vercel.app/api/orders` y escaneo continuo cada 25s en primer plano / 60s en segundo plano (`AlarmManager.setAlarmClock`).
+- **Mejoras Visuales Neo-Brutalistas:** Barra de progreso táctica hacia el TP en cada tarjeta, protección `FittedBox` en montos de bóveda y estética **Money Magnet** (`#FFF8E7`, `#FFFFFF`, `#FFD600`, `#FF5500`, `#0A0A0A`).

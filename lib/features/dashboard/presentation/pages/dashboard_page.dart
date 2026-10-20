@@ -54,6 +54,86 @@ class _DashboardPageState extends State<DashboardPage> {
     super.dispose();
   }
 
+  void _showEditCashDialog() {
+    final controller = TextEditingController(
+      text: SentinelAutoScanner.instance.liquidCashUsdt.toStringAsFixed(2),
+    );
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.background,
+        shape: const RoundedRectangleBorder(
+          side: BorderSide(color: AppColors.ink, width: 3.0),
+          borderRadius: BorderRadius.zero,
+        ),
+        title: const Text(
+          '💵 SALDO LIBRE SPOT (USDT)',
+          style: TextStyle(
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.w900,
+            fontSize: 13,
+            color: AppColors.ink,
+          ),
+        ),
+        content: TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          style: const TextStyle(
+            fontFamily: 'monospace',
+            fontWeight: FontWeight.w900,
+            fontSize: 18,
+            color: AppColors.ink,
+          ),
+          decoration: const InputDecoration(
+            prefixText: '\$ ',
+            suffixText: 'USDT',
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.zero,
+              borderSide: BorderSide(color: AppColors.ink, width: 2.0),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'CANCELAR',
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.bold,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.gold,
+              foregroundColor: AppColors.ink,
+              shape: const RoundedRectangleBorder(
+                side: BorderSide(color: AppColors.ink, width: 2.0),
+                borderRadius: BorderRadius.zero,
+              ),
+            ),
+            onPressed: () {
+              final val = double.tryParse(controller.text.replaceAll(',', '.'));
+              if (val != null && val >= 0) {
+                SentinelAutoScanner.instance.setLiquidCash(val);
+              }
+              Navigator.pop(ctx);
+            },
+            child: const Text(
+              'GUARDAR',
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _triggerImmediateAlarm({
     required String eventType,
     required String symbol,
@@ -61,8 +141,8 @@ class _DashboardPageState extends State<DashboardPage> {
     required String amount,
     required String targetPrice,
     required String projectedProfit,
-    String totalProfit = '+\$70.07 USDT',
-    String liquidCash = '\$36.59 USDT',
+    String totalProfit = '+\$84.33 USDT',
+    String liquidCash = '\$0.91 USDT',
   }) {
     NativeAlarmService.triggerImmediateAlarm(
       eventType: eventType,
@@ -83,8 +163,8 @@ class _DashboardPageState extends State<DashboardPage> {
     required String amount,
     required String targetPrice,
     required String projectedProfit,
-    String totalProfit = '+\$70.07 USDT',
-    String liquidCash = '\$36.59 USDT',
+    String totalProfit = '+\$84.33 USDT',
+    String liquidCash = '\$0.91 USDT',
   }) {
     setState(() {
       _countdown = 5;
@@ -213,7 +293,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           borderWidth: 2.0,
                         ),
                         child: const Text(
-                          'V.0.1.6',
+                          'V.0.1.8',
                           style: TextStyle(
                             fontFamily: 'monospace',
                             fontWeight: FontWeight.w900,
@@ -363,7 +443,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'MiCripto Sentinel V.0.1.6 • Terminal Centinela Dinámica',
+                    'MiCripto Sentinel V.0.1.8 • Terminal Centinela & Radar S+',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'monospace',
@@ -432,53 +512,62 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           const SizedBox(height: 12),
 
-          // Grilla de 2 Celdas Blancas: Saldo Libre Spot + En Órdenes Vivas
+          // Grilla de 2 Celdas Blancas: Saldo Libre Spot (Editable al tocar) + En Órdenes Vivas
           Row(
             children: [
               Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: AppColors.brutalistCell(
-                    color: AppColors.surface,
-                    borderWidth: 2.5,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        'SALDO LIBRE SPOT',
-                        style: TextStyle(
-                          fontSize: 9,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.textMuted,
-                          fontFamily: 'monospace',
+                child: GestureDetector(
+                  onTap: _showEditCashDialog,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: AppColors.brutalistCell(
+                      color: AppColors.surface,
+                      borderWidth: 2.5,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              'SALDO LIBRE SPOT',
+                              style: TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.textMuted,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                            Icon(Icons.edit, size: 11, color: AppColors.orange),
+                          ],
                         ),
-                      ),
-                      SizedBox(height: 4),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          '\$36.59',
-                          maxLines: 1,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w900,
-                            color: AppColors.ink,
-                            fontFamily: 'monospace',
+                        const SizedBox(height: 4),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            '\$${SentinelAutoScanner.instance.liquidCashUsdt.toStringAsFixed(2)}',
+                            maxLines: 1,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.ink,
+                              fontFamily: 'monospace',
+                            ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 2),
-                      Text(
-                        'USDT Líquido Disponible',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textSecondary,
+                        const SizedBox(height: 2),
+                        const Text(
+                          'USDT Líquido (Toca p/ editar)',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

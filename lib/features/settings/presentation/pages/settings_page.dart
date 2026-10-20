@@ -612,7 +612,7 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             color: AppColors.ink,
             child: const Text(
-              'MiCripto Sentinel — V.0.1.6',
+              'MiCripto Sentinel — V.0.1.8',
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.w900,
