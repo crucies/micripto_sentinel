@@ -128,6 +128,16 @@ class AlarmActivity : AppCompatActivity() {
         val layoutBuyAlarm = findViewById<LinearLayout>(R.id.layoutBuyAlarm)
         val layoutSellAlarm = findViewById<LinearLayout>(R.id.layoutSellAlarm)
         val layoutRadarAlarm = findViewById<LinearLayout>(R.id.layoutRadarAlarm)
+        val layoutKaiAlarm = findViewById<LinearLayout>(R.id.layoutKaiAlarm)
+
+        // Vistas del Formulario de Informe Táctico Kai
+        val tvKaiAppVersion = findViewById<TextView>(R.id.tvKaiAppVersion)
+        val tvKaiCurrentDate = findViewById<TextView>(R.id.tvKaiCurrentDate)
+        val tvKaiHeroTitle = findViewById<TextView>(R.id.tvKaiHeroTitle)
+        val tvKaiBadge = findViewById<TextView>(R.id.tvKaiBadge)
+        val tvKaiSummary = findViewById<TextView>(R.id.tvKaiSummary)
+        val tvKaiAction = findViewById<TextView>(R.id.tvKaiAction)
+        val tvKaiLiquidCash = findViewById<TextView>(R.id.tvKaiLiquidCash)
 
         // Vistas del Formulario de Radar Cuantitativo S+ / S
         val tvRadarAppVersion = findViewById<TextView>(R.id.tvRadarAppVersion)
@@ -200,6 +210,29 @@ class AlarmActivity : AppCompatActivity() {
             tvSellExecutedDate.text = if (sellDateExtra.isNotEmpty()) sellDateExtra else shortNow
 
             tvSellLiquidCash.text = if (cleanLiquid.isNotEmpty()) cleanLiquid else "891.0000 USDT"
+
+                } else if (eventType == "KAI_ANALYSIS") {
+            // ========================================================
+            // FORMULARIO 4: EXCLUSIVO DE INFORME TÁCTICO KAI (3H)
+            // ========================================================
+            layoutBuyAlarm.visibility = View.GONE
+            layoutSellAlarm.visibility = View.GONE
+            layoutRadarAlarm.visibility = View.GONE
+            layoutKaiAlarm.visibility = View.VISIBLE
+
+            val kaiTitle = intent.getStringExtra("kai_title") ?: "INFORME TÁCTICO KAI (3H)"
+            val kaiHero = intent.getStringExtra("kai_hero") ?: "PORTAFOLIO • 17 ÓRDENES ACTIVAS"
+            val kaiSummary = intent.getStringExtra("kai_summary") ?: rawProjectedProfit
+            val kaiAction = intent.getStringExtra("kai_action") ?: rawAmount
+            val kaiTimestamp = intent.getStringExtra("kai_timestamp") ?: shortNow
+
+            tvKaiAppVersion.text = appVersionExtra
+            tvKaiCurrentDate.text = kaiTimestamp
+            tvKaiHeroTitle.text = kaiTitle
+            tvKaiBadge.text = kaiHero
+            tvKaiSummary.text = kaiSummary
+            tvKaiAction.text = kaiAction
+            tvKaiLiquidCash.text = if (cleanLiquid.isNotEmpty()) cleanLiquid else "458.5900 USDT"
 
         } else if (eventType == "S_PLUS_ALPHA") {
             // ========================================================

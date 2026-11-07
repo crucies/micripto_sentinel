@@ -8,6 +8,7 @@ import '../../../../core/services/sentinel_auto_scanner.dart';
 import '../../../orders/domain/order_entity.dart';
 import '../../../orders/presentation/widgets/order_detail_modal.dart';
 import '../../../orders/presentation/widgets/archived_orders_modal.dart';
+import '../../../orders/presentation/widgets/kai_briefing_modal.dart';
 import '../widgets/macro_regime_widget.dart';
 import '../../../../core/services/macro_regime_service.dart';
 
@@ -1235,6 +1236,40 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ],
           ),
+          if (scanner.remoteAlert != null && (scanner.remoteAlert!['hasAlert'] == true)) ...[
+            const SizedBox(height: 8),
+            InkWell(
+              onTap: () => KaiBriefingModal.show(context, scanner.remoteAlert!),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                decoration: AppColors.brutalistCell(
+                  color: AppColors.gold,
+                  borderWidth: 1.8,
+                ),
+                child: Row(
+                  children: [
+                    const Text('🧠', style: TextStyle(fontSize: 14)),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'KAI: ${scanner.remoteAlert!['hero'] ?? 'INFORME TÁCTICO ACTIVO'}',
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.ink,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios, size: 10, color: AppColors.ink),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );

@@ -134,6 +134,11 @@ class SentinelForegroundService : Service() {
                     cycleCount++
                     checkOrders()
 
+                                        // Cada 3 ciclos (cada ~60 segundos): Sincronización Remota con GitHub Raw (Kai 3H Alert & Orders)
+                    if (cycleCount % 3 == 0) {
+                        checkKaiRemoteSync()
+                    }
+
                     // Cada 6 ciclos (cada ~2 minutos): Escaneo Radar S+
                     if (cycleCount % 6 == 0) {
                         checkRadarSPlus()
@@ -155,6 +160,66 @@ class SentinelForegroundService : Service() {
             name = "SentinelForegroundWorker"
             isDaemon = true
             start()
+        }
+    }
+
+        private fun checkKaiRemoteSync() {
+        try {
+            val url = URL("https://raw.githubusercontent.com/crucies/micripto_sentinel/master/assets/data/sentinel_sync.json")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.connectTimeout = 6000
+            conn.readTimeout = 6000
+            conn.setRequestProperty("User-Agent", "Mozilla/5.0 MiCriptoSentinel/2.20")
+            if (conn.responseCode != 200) return
+
+            val text = conn.inputStream.bufferedReader().readText()
+            if (text.isEmpty()) return
+            val json = JSONObject(text)
+
+            val prefs = getSharedPreferences("sentinel_orders_prefs", Context.MODE_PRIVATE)
+
+            // 1. Mantener actualizadas órdenes locales y saldo si vinieron en la nube
+            if (json.has("orders")) {
+                val ordersArr = json.getJSONArray("orders")
+                prefs.edit().putString("cached_orders_json", ordersArr.toString()).apply()
+            }
+            if (json.has("liquidCashUsdt")) {
+                val cash = json.getDouble("liquidCashUsdt")
+                val settingsPrefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+                settingsPrefs.edit().putFloat("liquid_cash_usdt", cash.toFloat()).apply()
+            }
+
+            // 2. Verificar si hay un Informe Táctico / Alerta Remota de Kai
+            if (json.has("remoteAlert")) {
+                val alert = json.getJSONObject("remoteAlert")
+                val hasAlert = alert.optBoolean("hasAlert", false)
+                val alertId = alert.optString("id", "")
+                val lastId = prefs.getString("last_kai_remote_alert_id", "")
+
+                if (hasAlert && alertId.isNotEmpty() && alertId != lastId) {
+                    prefs.edit().putString("last_kai_remote_alert_id", alertId).apply()
+                    val title = alert.optString("title", "INFORME TÁCTICO KAI (3H)")
+                    val hero = alert.optString("hero", "PORTAFOLIO • 17 ÓRDENES ACTIVAS")
+                    val summary = alert.optString("summary", "")
+                    val action = alert.optString("action", "")
+                    val timestamp = alert.optString("timestamp", "")
+                    val liquidCash = "$" + json.optDouble("liquidCashUsdt", 458.59) + " USDT"
+
+                    FileLogger.logInfo(this, "🔔 [Foreground] ¡NUEVA ALERTA TÁCTICA DE KAI RECIBIDA! ID: " + alertId)
+                    SentinelAlarmReceiver.fireKaiAlert(
+                        context = this,
+                        title = title,
+                        hero = hero,
+                        summary = summary,
+                        action = action,
+                        timestamp = timestamp,
+                        liquidCash = liquidCash,
+                        appVersion = "V 0.2.20"
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            FileLogger.logWarning(this, "⚠️ [Foreground] Error en checkKaiRemoteSync: " + e.message)
         }
     }
 

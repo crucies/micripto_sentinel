@@ -1,5 +1,43 @@
 # 📜 Bitácora de Versiones — MiCripto Sentinel
 
+## [V.0.2.20] - 2026-11-07
+### Despertar Militar con Modal Táctico Remoto de Kai (3H), Conciliación Exacta de 17 Órdenes Spot (2 Compras + 15 Ventas TP) y Sincronización Automática en Segundo Plano 24/7
+
+- **Mandatos de Richard:**
+  1. *"Mate... podrias enviarme mensajes actualizados acerca nuestras posiciones ?... generas un reporte cada 3 horas (creo quedamos)... si vez algo que necesitemos hacer o tomar en cuenta de manera rapida... quisiera analizes la situacion y me envies informacion que nos ayude... sin que yo te pregunte... podrias despertar la app y mostrar un modal con la informacion que nos sea util"*
+  2. *"por cierto... tenemos 2 ordenes de compra... 17 ordenes en total..."*
+- **Soluciones Implementadas:**
+  1. **Conciliación Total de las 17 Órdenes en Binance Spot:**
+     - **2 Compras Límite:**
+       - `PENDLE/USDT` @ $1.6310 (61.30 PENDLE = $99.98 USDT) - colocado 2026-11-07 06:06:47.
+       - `LINK/USDT` @ $10.5500 (9.47 LINK = $99.91 USDT) - colocado 2026-11-07 06:27:48.
+     - **15 Ventas Límite (Take Profits):**
+       - `NEAR/USDT` TP1 @ $3.8010 (13.55 NEAR = $51.50 USDT).
+       - `NEAR/USDT` TP2 @ $3.8930 (13.55 NEAR = $52.75 USDT).
+       - `APT/USDT` @ $0.7360 (57.11 APT = $42.03 USDT).
+       - `ALGO/USDT` @ $0.1165 (840 ALGO = $97.86 USDT).
+       - `XLM/USDT` @ $0.1840 (446 XLM = $82.06 USDT).
+       - `ADA/USDT` TP2 @ $0.2278 (508.4 ADA = $115.81 USDT).
+       - `ADA/USDT` TP1 @ $0.2224 (415.8 ADA = $92.47 USDT).
+       - `AAVE/USDT` TP2 @ $156.14 (0.731 AAVE = $114.14 USDT).
+       - `AAVE/USDT` TP1 @ $152.44 (0.622 AAVE = $94.82 USDT).
+       - `JUP/USDT` TP2 @ $0.3331 (505 JUP = $168.22 USDT).
+       - `JUP/USDT` TP1 @ $0.3252 (450 JUP = $146.34 USDT).
+       - `TIA/USDT` TP2 @ $0.6450 (169 TIA = $109.01 USDT).
+       - `TIA/USDT` TP1 @ $0.6200 (169 TIA = $104.78 USDT).
+       - `OP/USDT` TP2 @ $0.1352 (727.08 OP = $98.30 USDT).
+       - `SUI/USDT` TP2 @ $1.0650 (149.7 SUI = $159.43 USDT).
+     - Saldo líquido en Bóveda Spot: **$458.59 USDT**.
+  2. **Motor de Despertador Proactivo y Modal Remoto de Kai (24/7):**
+     - En `SentinelForegroundService.kt`: ciclo de comprobación en background cada ~60 segundos contra `sentinel_sync.json` en GitHub Raw.
+     - Al detectar una nueva alerta táctica con `hasAlert: true`: adquiere `SCREEN_BRIGHT_WAKE_LOCK` + `ACQUIRE_CAUSES_WAKEUP`, enciende la pantalla física, rompe el bloqueo con `setShowWhenLocked(true)` y despliega `AlarmActivity` con el **Formulario Militar de Informe Táctico de Kai**.
+     - En Flutter: banner dinámico neo-brutalista en el Dashboard que permite abrir el modal táctico (`KaiBriefingModal`) con 1 toque en cualquier momento.
+  3. **Rutina de Análisis Automatizado Cada 3 Horas:**
+     - Integración del scheduler autónomo de Antigravity (`schedule`) para revisar el mercado Spot, variaciones de PENDLE, NEAR, LINK, XRP, ONDO y sincronizar la nube sin intervención manual.
+- **Despliegue de APK:**
+  - Archivo generado: [`micripto_sentinel_v0.2.20_DespertarModalKai17Ordenes.apk`](file:///C:/Richard/A/Aplicaciones%20Moviles/APKs/micripto_sentinel_v0.2.20_DespertarModalKai17Ordenes.apk)
+  - Ubicación central: `C:\Richard\A\Aplicaciones Moviles\APKs`
+
 ## [V.0.2.19] - 2026-11-07
 ### Sincronización Automática con 1 Toque (GitHub Raw Directo), Cero Vercel/Web Intermedia y Conciliación Oficial de 14 Órdenes Binance Spot ($458.59 USDT Líquidos)
 

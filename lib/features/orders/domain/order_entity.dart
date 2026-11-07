@@ -168,9 +168,9 @@ class OrderEntity {
     };
   }
 
-  // Lista oficial de órdenes vivas en Binance Spot (14 Órdenes Activas de Compra y Venta)
+  // Lista oficial de órdenes vivas en Binance Spot (17 Órdenes Activas de Compra y Venta)
   static const List<OrderEntity> currentLiveOrders = [
-    // 🎯 COMPRAS LÍMITE ACTIVAS EN SUELO
+    // 🎯 COMPRAS LÍMITE ACTIVAS EN SUELO (2 Órdenes)
     OrderEntity(
       id: 'binance-pendle-buy-16310',
       symbol: 'PENDLEUSDT',
@@ -185,8 +185,52 @@ class OrderEntity {
       status: '0% Filled (Esperando Suelo @ \$1.6310)',
       notes: 'Limit Buy en suelo @ \$1.6310 (61.30 PENDLE = \$99.98 USDT)',
     ),
+    OrderEntity(
+      id: 'binance-link-buy-10550',
+      symbol: 'LINKUSDT',
+      displaySymbol: 'LINK (Compra Límite)',
+      side: 'Limit Buy',
+      targetPrice: 10.5500,
+      entryPrice: 10.5500,
+      amountCoins: 9.47,
+      expectedReturnUsdt: 99.9085,
+      projectedProfitUsdt: 4.5000,
+      datePlaced: '2026-11-07 06:27:48 BOT',
+      status: '0% Filled (Esperando Suelo @ \$10.550)',
+      notes: 'Limit Buy en retroceso clave @ \$10.550 (9.47 LINK = \$99.91 USDT)',
+    ),
 
-    // 🎯 VENTAS / TAKE PROFIT ACTIVAS (13 Órdenes Vivas Sincronizadas)
+    // 🎯 VENTAS / TAKE PROFIT ACTIVAS (15 Órdenes Vivas Sincronizadas)
+    // NEAR
+    OrderEntity(
+      id: 'binance-near-sell-tp1-38010',
+      symbol: 'NEARUSDT',
+      displaySymbol: 'NEAR (TP1)',
+      side: 'Limit Sell',
+      targetPrice: 3.8010,
+      entryPrice: 3.6900,
+      amountCoins: 13.55,
+      expectedReturnUsdt: 51.5035,
+      projectedProfitUsdt: 1.5040,
+      datePlaced: '2026-11-07 06:22:00 BOT',
+      status: '0% Filled (Esperando TP1)',
+      notes: 'Limit Sell defensivo TP1 @ \$3.8010 (+3.0%) (13.55 NEAR = \$51.50 USDT)',
+    ),
+    OrderEntity(
+      id: 'binance-near-sell-tp2-38930',
+      symbol: 'NEARUSDT',
+      displaySymbol: 'NEAR (TP2)',
+      side: 'Limit Sell',
+      targetPrice: 3.8930,
+      entryPrice: 3.6900,
+      amountCoins: 13.55,
+      expectedReturnUsdt: 52.7501,
+      projectedProfitUsdt: 2.7506,
+      datePlaced: '2026-11-07 06:22:00 BOT',
+      status: '0% Filled (Esperando TP2)',
+      notes: 'Limit Sell expansivo TP2 @ \$3.8930 (+5.5%) (13.55 NEAR = \$52.75 USDT)',
+    ),
+
     // APT
     OrderEntity(
       id: 'binance-apt-sell-07360',

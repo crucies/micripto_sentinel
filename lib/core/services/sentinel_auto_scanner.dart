@@ -39,6 +39,7 @@ class SentinelAutoScanner extends ChangeNotifier {
   String _lastScanTime = '--:--:--';
   String _statusMessage = '🟢 CENTINELA 100% AUTÓNOMO: Auto-scan Binance cada 25s';
   double _liquidCashUsdt = 458.59;
+  Map<String, dynamic>? _remoteAlert;
 
   Timer? _foregroundScanTimer;
 
@@ -57,6 +58,7 @@ class SentinelAutoScanner extends ChangeNotifier {
   String get lastCloudSyncTime => 'GitHub Master';
   String get statusMessage => _statusMessage;
   double get liquidCashUsdt => _liquidCashUsdt;
+  Map<String, dynamic>? get remoteAlert => _remoteAlert;
 
   void setLiquidCash(double value) {
     _liquidCashUsdt = value;
@@ -308,6 +310,10 @@ class SentinelAutoScanner extends ChangeNotifier {
           final List<dynamic> list = data['orders'];
           _orders = list.map((item) => OrderEntity.fromJson(item as Map<String, dynamic>)).toList();
           await _persistLiveOrders();
+        }
+
+        if (data.containsKey('remoteAlert') && data['remoteAlert'] is Map) {
+          _remoteAlert = Map<String, dynamic>.from(data['remoteAlert'] as Map);
         }
 
         _statusMessage = '🟢 SINCRONIZADO: ${_orders.length} órdenes activas • \$${_liquidCashUsdt.toStringAsFixed(2)} USDT';

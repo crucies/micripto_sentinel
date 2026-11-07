@@ -1388,6 +1388,246 @@
 
         </LinearLayout>
 
+        <!-- ======================================================== -->
+        <!-- CONTENEDOR 4: FORMULARIO EXCLUSIVO DE INFORME TÁCTICO KAI -->
+        <!-- ANÁLISIS CUANTITATIVO CADA 3H Y ALERTAS REMOTAS (R&K)     -->
+        <!-- ======================================================== -->
+        <LinearLayout
+            android:id="@+id/layoutKaiAlarm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- 1. CABECERA: [SENTINEL KAI] y [V 0.2.20] -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" SENTINEL KAI "
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:background="@drawable/bg_brutalist_black"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="8dp" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tvKaiAppVersion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="V 0.2.20"
+                    android:textColor="#FFD600"
+                    android:textStyle="bold"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace"
+                    android:background="@drawable/bg_brutalist_cell_white"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="6dp"
+                    android:paddingBottom="8dp" />
+            </LinearLayout>
+
+            <!-- 2. FECHA / HORA -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_brutalist_cell_white"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="9dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reporte Táctico"
+                    android:textColor="#0A0A0A"
+                    android:textStyle="bold"
+                    android:textSize="11.5sp"
+                    android:fontFamily="monospace" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tvKaiCurrentDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="07/11/26 • 07:30 BOT"
+                    android:textColor="#0A0A0A"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace" />
+            </LinearLayout>
+
+            <!-- 3. TÍTULO HERO -->
+            <TextView
+                android:id="@+id/tvKaiHeroTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="INFORME TÁCTICO KAI (3H)"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:background="@drawable/bg_brutalist_black"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="10dp" />
+
+            <!-- 4. BADGE DE ESTADO -->
+            <TextView
+                android:id="@+id/tvKaiBadge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⭐ 17 ÓRDENES ACTIVAS • VIGILANCIA SPOT"
+                android:textColor="#0A0A0A"
+                android:textStyle="bold"
+                android:textSize="11.5sp"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:background="@drawable/bg_brutalist_yellow"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- 5. TARJETA RESUMEN CUANTITATIVO -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_brutalist_cell_white"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📊 SITUACIÓN DEL PORTAFOLIO"
+                    android:textColor="#0A0A0A"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvKaiSummary"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="BTC consolidando en $76K. PENDLE a 0.24% de ejecución ($1.635 vs $1.631). NEAR comprado a $3.69 con TPs listos ($3.801 / $3.893). LINK esperando en suelo @ $10.55."
+                    android:textColor="#0A0A0A"
+                    android:textSize="11.5sp"
+                    android:fontFamily="monospace"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- 6. TARJETA ACCIONES INMEDIATAS RECOMENDADAS -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_brutalist_cell_amber"
+                android:padding="14dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚡ ACCIÓN ESTRATÉGICA KAI"
+                    android:textColor="#78350F"
+                    android:textStyle="bold"
+                    android:textSize="12sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:id="@+id/tvKaiAction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Mantener las 17 órdenes sin tocar. Saldo libre de $458.59 USDT listo para absorber oportunidades."
+                    android:textColor="#0A0A0A"
+                    android:textSize="11.5sp"
+                    android:textStyle="bold"
+                    android:fontFamily="monospace"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- 7. LIQUIDEZ DISPONIBLE SPOT -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_brutalist_card_white"
+                android:padding="14dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="💵 DISPONIBILIDAD SPOT EN BINANCE"
+                    android:textColor="#0A0A0A"
+                    android:textStyle="bold"
+                    android:textSize="11.5sp"
+                    android:fontFamily="monospace"
+                    android:layout_marginBottom="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:background="@drawable/bg_brutalist_cell_white"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/tvKaiLiquidCash"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="458.5900 USDT"
+                        android:textColor="#047857"
+                        android:textStyle="bold"
+                        android:textSize="22sp"
+                        android:fontFamily="monospace"
+                        android:letterSpacing="0.03" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="💡 Monitoreo activo cada 25s por el Centinela Nativo"
+                    android:textColor="#78350F"
+                    android:textStyle="bold"
+                    android:textSize="10sp"
+                    android:fontFamily="monospace"
+                    android:gravity="center" />
+            </LinearLayout>
+
+        </LinearLayout>
+
         <!-- 7. BOTONES BRUTALISTAS DE ACCIÓN -->
         <LinearLayout
             android:layout_width="match_parent"

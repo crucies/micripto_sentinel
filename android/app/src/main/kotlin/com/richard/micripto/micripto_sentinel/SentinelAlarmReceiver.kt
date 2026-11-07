@@ -64,6 +64,103 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
             alarmManager.cancel(pendingIntent)
         }
 
+                fun fireKaiAlert(
+            context: Context,
+            title: String,
+            hero: String,
+            summary: String,
+            action: String,
+            timestamp: String,
+            liquidCash: String = "$458.59 USDT",
+            appVersion: String = "V 0.2.20"
+        ) {
+            val settingsPrefs = context.getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+            val soundMode = settingsPrefs.getString("sound_mode", "ALWAYS") ?: "ALWAYS"
+            if (soundMode == "TOTAL_SILENCE") {
+                FileLogger.logInfo(context, "🔕 [Receiver] ALERTA KAI SUPRIMIDA por MODO SILENCIO TOTAL")
+                return
+            }
+
+            FileLogger.logInfo(context, "🔔 [Receiver] Disparo de Informe Táctico Kai: $title")
+
+            // 1. Audio Inmediato
+            SentinelAudioManager.play(context)
+
+            // 2. WakeLock agresivo para encender pantalla física
+            try {
+                val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                @Suppress("DEPRECATION")
+                val wl = pm?.newWakeLock(
+                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                    PowerManager.ON_AFTER_RELEASE,
+                    "micripto:receiver_kai_wakeup"
+                )
+                wl?.acquire(60000)
+            } catch (e: Exception) {
+                FileLogger.logError(context, "Error adquiriendo WakeLock para Kai Alert", e)
+            }
+
+            // 3. Preparar Intent para AlarmActivity
+            val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                putExtra("event_type", "KAI_ANALYSIS")
+                putExtra("symbol", "PORTAFOLIO")
+                putExtra("kai_title", title)
+                putExtra("kai_hero", hero)
+                putExtra("kai_summary", summary)
+                putExtra("kai_action", action)
+                putExtra("kai_timestamp", timestamp)
+                putExtra("liquid_cash", liquidCash)
+                putExtra("app_version", appVersion)
+            }
+
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+            val fullScreenPendingIntent = PendingIntent.getActivity(context, 1003, alarmIntent, flags)
+
+            // Canal y Notificación Heads-Up
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    CHANNEL_ID,
+                    "MiCripto Sentinel Alarmas Críticas",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Alertas críticas y tácticas de Richard & Kai"
+                    enableVibration(true)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                }
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            val notif = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle("🧠 " + title)
+                .setContentText(hero)
+                .setStyle(NotificationCompat.BigTextStyle().bigText(hero + "\n\n" + summary + "\n\n⚡ Acción: " + action))
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setFullScreenIntent(fullScreenPendingIntent, true)
+                .setContentIntent(fullScreenPendingIntent)
+                .setAutoCancel(true)
+                .build()
+
+            notificationManager.notify(NOTIFICATION_ID, notif)
+
+            try {
+                context.startActivity(alarmIntent)
+            } catch (e: Exception) {
+                FileLogger.logError(context, "Error iniciando AlarmActivity para Kai", e)
+            }
+        }
+
         fun fireImmediateAlarm(
             context: Context,
             symbol: String,
