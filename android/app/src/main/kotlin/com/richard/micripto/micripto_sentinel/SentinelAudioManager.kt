@@ -34,7 +34,10 @@ object SentinelAudioManager {
             var allowAudio = true
             var allowVibrate = true
 
-            if (soundMode == "DEVICE_SETTINGS") {
+            if (soundMode == "TOTAL_SILENCE") {
+                FileLogger.logInfo(context, "🔕 [Audio] Silencio Total activo: ningún audio ni vibración")
+                return
+            } else if (soundMode == "DEVICE_SETTINGS") {
                 when (ringerMode) {
                     AudioManager.RINGER_MODE_SILENT -> {
                         allowAudio = false

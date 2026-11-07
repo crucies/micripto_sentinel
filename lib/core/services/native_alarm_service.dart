@@ -13,6 +13,17 @@ class NativeAlarmService {
     required String projectedProfit,
     String totalProfit = '+\$41.56 USDT',
     String liquidCash = '\$345.84 USDT',
+    String tp1Price = '',
+    String tp2Price = '',
+    String slPrice = '',
+    String limitBuyPrice = '',
+    double tradeAmount = 100.0,
+    String buyPrice = '',
+    String buyDate = '',
+    String sellDate = '',
+    String elapsedTime = '',
+    String appVersion = 'V 0.2.5',
+    String totalCoins = '',
   }) async {
     try {
       final res = await _channel.invokeMethod<bool>('triggerImmediateAlarm', {
@@ -24,6 +35,17 @@ class NativeAlarmService {
         'projectedProfit': projectedProfit,
         'totalProfit': totalProfit,
         'liquidCash': liquidCash,
+        'tp1Price': tp1Price,
+        'tp2Price': tp2Price,
+        'slPrice': slPrice,
+        'limitBuyPrice': limitBuyPrice,
+        'tradeAmount': tradeAmount,
+        'buyPrice': buyPrice,
+        'buyDate': buyDate,
+        'sellDate': sellDate,
+        'elapsedTime': elapsedTime,
+        'appVersion': appVersion,
+        'totalCoins': totalCoins,
       });
       return res ?? false;
     } catch (e) {
@@ -42,6 +64,17 @@ class NativeAlarmService {
     required String projectedProfit,
     String totalProfit = '+\$41.56 USDT',
     String liquidCash = '\$345.84 USDT',
+    String tp1Price = '',
+    String tp2Price = '',
+    String slPrice = '',
+    String limitBuyPrice = '',
+    double tradeAmount = 100.0,
+    String buyPrice = '',
+    String buyDate = '',
+    String sellDate = '',
+    String elapsedTime = '',
+    String appVersion = 'V 0.2.5',
+    String totalCoins = '',
   }) async {
     try {
       final res = await _channel.invokeMethod<bool>('scheduleTestAlarm', {
@@ -55,6 +88,17 @@ class NativeAlarmService {
           'projectedProfit': projectedProfit,
           'totalProfit': totalProfit,
           'liquidCash': liquidCash,
+          'tp1Price': tp1Price,
+          'tp2Price': tp2Price,
+          'slPrice': slPrice,
+          'limitBuyPrice': limitBuyPrice,
+          'tradeAmount': tradeAmount,
+          'buyPrice': buyPrice,
+          'buyDate': buyDate,
+          'sellDate': sellDate,
+          'elapsedTime': elapsedTime,
+          'appVersion': appVersion,
+        'totalCoins': totalCoins,
         },
       });
       return res ?? false;
@@ -181,5 +225,148 @@ class NativeAlarmService {
       return false;
     }
   }
-}
 
+  /// Verificar si la app tiene desactivada la optimización de batería (Doze Mode Unrestricted)
+  static Future<bool> isIgnoringBatteryOptimizations() async {
+    try {
+      final res = await _channel.invokeMethod<bool>('isIgnoringBatteryOptimizations');
+      return res ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Solicitar al usuario desactivar la optimización de batería para vigilancia 24/7 en bloqueo
+  static Future<bool> requestIgnoreBatteryOptimizations() async {
+    try {
+      final res = await _channel.invokeMethod<bool>('requestIgnoreBatteryOptimizations');
+      return res ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Guardar órdenes archivadas en SharedPreferences nativo
+  static Future<bool> saveArchivedOrders(String archivedOrdersJson) async {
+    try {
+      final res = await _channel.invokeMethod<bool>('saveArchivedOrders', {'archivedOrdersJson': archivedOrdersJson});
+      return res ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Obtener órdenes archivadas guardadas en SharedPreferences nativo
+  static Future<String?> getArchivedOrders() async {
+    try {
+      return await _channel.invokeMethod<String>('getArchivedOrders');
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Obtener ajuste de cadena de texto persistido en SharedPreferences nativo
+  static Future<String> getSetting(String key, {String defaultValue = ''}) async {
+    try {
+      final res = await _channel.invokeMethod<String>('getSetting', {
+        'key': key,
+        'defaultValue': defaultValue,
+      });
+      return res ?? defaultValue;
+    } catch (_) {
+      return defaultValue;
+    }
+  }
+
+  /// Guardar ajuste de cadena de texto persistido en SharedPreferences nativo
+  static Future<bool> setSetting(String key, String value) async {
+    try {
+      final res = await _channel.invokeMethod<bool>('setSetting', {
+        'key': key,
+        'value': value,
+      });
+      return res ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Obtener ajuste booleano persistido en SharedPreferences nativo
+  static Future<bool> getBoolSetting(String key, {bool defaultValue = false}) async {
+    try {
+      final res = await _channel.invokeMethod<bool>('getBoolSetting', {
+        'key': key,
+        'defaultValue': defaultValue,
+      });
+      return res ?? defaultValue;
+    } catch (_) {
+      return defaultValue;
+    }
+  }
+
+  /// Guardar ajuste booleano persistido en SharedPreferences nativo
+  static Future<bool> setBoolSetting(String key, bool value) async {
+    try {
+      final res = await _channel.invokeMethod<bool>('setBoolSetting', {
+        'key': key,
+        'value': value,
+      });
+      return res ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Obtener ajuste double persistido en SharedPreferences nativo
+  static Future<double> getDoubleSetting(String key, {double defaultValue = 100.0}) async {
+    try {
+      final res = await _channel.invokeMethod<double>('getDoubleSetting', {
+        'key': key,
+        'defaultValue': defaultValue,
+      });
+      return res ?? defaultValue;
+    } catch (_) {
+      return defaultValue;
+    }
+  }
+
+  /// Guardar ajuste double persistido en SharedPreferences nativo
+  static Future<bool> setDoubleSetting(String key, double value) async {
+    try {
+      final res = await _channel.invokeMethod<bool>('setDoubleSetting', {
+        'key': key,
+        'value': value,
+      });
+      return res ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Verificar si el Servicio Nativo en Primer Plano 24/7 está corriendo activamente
+  static Future<bool> isForegroundServiceRunning() async {
+    try {
+      final res = await _channel.invokeMethod<bool>('isForegroundServiceRunning');
+      return res ?? false;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Verificar si la app tiene permiso de Alarmas Exactas (Android 12+)
+  static Future<bool> checkExactAlarmPermission() async {
+    try {
+      final res = await _channel.invokeMethod<bool>('checkExactAlarmPermission');
+      return res ?? true;
+    } catch (_) {
+      return true;
+    }
+  }
+
+  /// Solicitar permiso de Alarmas Exactas en Ajustes del Sistema
+  static Future<void> requestExactAlarmPermission() async {
+    try {
+      await _channel.invokeMethod('requestExactAlarmPermission');
+    } catch (_) {}
+  }
+}

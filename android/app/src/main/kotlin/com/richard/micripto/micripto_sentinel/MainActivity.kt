@@ -7,7 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.SystemClock
+import android.os.PowerManager
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -19,8 +19,10 @@ class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        // Suscripción automática a tópicos de alertas
-        com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic("sentinel_alerts")
+        // Suscripción automática a tópicos de alertas FCM
+        try {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic("sentinel_alerts")
+        } catch (_: Exception) {}
 
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL).setMethodCallHandler { call, result ->
             when (call.method) {
@@ -29,16 +31,19 @@ class MainActivity : FlutterActivity() {
                     launchAlarmActivity(args)
                     result.success(true)
                 }
+
                 "scheduleTestAlarm" -> {
                     val delaySeconds = call.argument<Int>("delaySeconds") ?: 5
                     val args = call.argument<Map<String, Any?>>("data") ?: emptyMap()
                     scheduleAlarm(delaySeconds, args)
                     result.success(true)
                 }
+
                 "openBinance" -> {
                     openBinanceApp()
                     result.success(true)
                 }
+
                 "getFcmToken" -> {
                     com.google.firebase.messaging.FirebaseMessaging.getInstance().token
                         .addOnCompleteListener { task ->
@@ -51,19 +56,23 @@ class MainActivity : FlutterActivity() {
                             }
                         }
                 }
+
                 "getLogs" -> {
                     val logs = FileLogger.getLogs(this)
                     result.success(logs)
                 }
+
                 "clearLogs" -> {
                     FileLogger.clearLogs(this)
                     result.success(true)
                 }
+
                 "getSoundMode" -> {
                     val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
                     val mode = prefs.getString("sound_mode", "ALWAYS") ?: "ALWAYS"
                     result.success(mode)
                 }
+
                 "setSoundMode" -> {
                     val mode = call.argument<String>("mode") ?: "ALWAYS"
                     val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
@@ -71,11 +80,13 @@ class MainActivity : FlutterActivity() {
                     FileLogger.logInfo(this, "⚙️ Modo de Sonido actualizado a: $mode")
                     result.success(true)
                 }
+
                 "logEvent" -> {
                     val message = call.argument<String>("message") ?: ""
                     FileLogger.logInfo(this, "[UI] $message")
                     result.success(true)
                 }
+
                 "checkOverlayPermission" -> {
                     val canDraw = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         android.provider.Settings.canDrawOverlays(this)
@@ -84,6 +95,7 @@ class MainActivity : FlutterActivity() {
                     }
                     result.success(canDraw)
                 }
+
                 "requestOverlayPermission" -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(this)) {
                         val intent = Intent(
@@ -94,6 +106,7 @@ class MainActivity : FlutterActivity() {
                     }
                     result.success(true)
                 }
+
                 "saveCachedOrders" -> {
                     val ordersJson = call.argument<String>("ordersJson") ?: "[]"
                     val prefs = getSharedPreferences("sentinel_orders_prefs", Context.MODE_PRIVATE)
@@ -101,31 +114,157 @@ class MainActivity : FlutterActivity() {
                     FileLogger.logInfo(this, "💾 [Orders] Órdenes dinámicas guardadas en SharedPreferences nativo")
                     result.success(true)
                 }
+
                 "getCachedOrders" -> {
                     val prefs = getSharedPreferences("sentinel_orders_prefs", Context.MODE_PRIVATE)
                     val ordersJson = prefs.getString("cached_orders_json", null)
                     result.success(ordersJson)
                 }
+
                 "startNativeBackgroundScan" -> {
-                    SentinelAlarmReceiver.scheduleNextScan(this, 10) // Primer escaneo en 10s
-                    FileLogger.logInfo(this, "🟢 [Sentinel] Escaneo de fondo nativo activado 24/7")
+                    SentinelForegroundService.start(this)
+                    SentinelAlarmReceiver.scheduleNextScan(this, 10)
+                    FileLogger.logInfo(this, "🟢 [Sentinel] Servicio en Primer Plano + Watchdog nativo 24/7 activados")
                     result.success(true)
                 }
+
                 "stopNativeBackgroundScan" -> {
+                    SentinelForegroundService.stop(this)
                     SentinelAlarmReceiver.stopScanning(this)
-                    FileLogger.logInfo(this, "🛑 [Sentinel] Escaneo de fondo nativo pausado")
+                    FileLogger.logInfo(this, "🛑 [Sentinel] Servicio en Primer Plano y escaneo de fondo pausados")
                     result.success(true)
                 }
-                else -> {
-                    result.notImplemented()
+
+                "isForegroundServiceRunning" -> {
+                    result.success(SentinelForegroundService.isRunning)
                 }
+
+                "checkExactAlarmPermission" -> {
+                    val am = getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+                    val canSchedule = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        am?.canScheduleExactAlarms() ?: true
+                    } else {
+                        true
+                    }
+                    result.success(canSchedule)
+                }
+
+                "requestExactAlarmPermission" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        try {
+                            val intent = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                                data = Uri.parse("package:$packageName")
+                            }
+                            startActivity(intent)
+                        } catch (_: Exception) {}
+                    }
+                    result.success(true)
+                }
+
+                "isIgnoringBatteryOptimizations" -> {
+                    val pm = getSystemService(Context.POWER_SERVICE) as? PowerManager
+                    val isIgnoring = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        pm?.isIgnoringBatteryOptimizations(packageName) ?: false
+                    } else {
+                        true
+                    }
+                    result.success(isIgnoring)
+                }
+
+                "requestIgnoreBatteryOptimizations" -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        try {
+                            val intent = Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                                data = Uri.parse("package:$packageName")
+                            }
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            try {
+                                val intent = Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+                                startActivity(intent)
+                            } catch (_: Exception) {}
+                        }
+                    }
+                    result.success(true)
+                }
+
+                "saveArchivedOrders" -> {
+                    val json = call.argument<String>("archivedOrdersJson") ?: "[]"
+                    val prefs = getSharedPreferences("sentinel_orders_prefs", Context.MODE_PRIVATE)
+                    prefs.edit().putString("archived_orders_json", json).apply()
+                    FileLogger.logInfo(this, "📦 [Orders] Órdenes archivadas guardadas en SharedPreferences")
+                    result.success(true)
+                }
+
+                "getArchivedOrders" -> {
+                    val prefs = getSharedPreferences("sentinel_orders_prefs", Context.MODE_PRIVATE)
+                    val json = prefs.getString("archived_orders_json", null)
+                    result.success(json)
+                }
+
+                "getSetting" -> {
+                    val key = call.argument<String>("key") ?: ""
+                    val defVal = call.argument<String>("defaultValue") ?: ""
+                    val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+                    result.success(prefs.getString(key, defVal))
+                }
+
+                "setSetting" -> {
+                    val key = call.argument<String>("key") ?: ""
+                    val value = call.argument<String>("value") ?: ""
+                    val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+                    prefs.edit().putString(key, value).apply()
+                    result.success(true)
+                }
+
+                "getBoolSetting" -> {
+                    val key = call.argument<String>("key") ?: ""
+                    val defVal = call.argument<Boolean>("defaultValue") ?: false
+                    val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+                    result.success(prefs.getBoolean(key, defVal))
+                }
+
+                "setBoolSetting" -> {
+                    val key = call.argument<String>("key") ?: ""
+                    val value = call.argument<Boolean>("value") ?: false
+                    val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+                    prefs.edit().putBoolean(key, value).apply()
+                    result.success(true)
+                }
+
+                "getDoubleSetting" -> {
+                    val key = call.argument<String>("key") ?: ""
+                    val defVal = call.argument<Double>("defaultValue") ?: 0.0
+                    val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+                    val str = prefs.getString(key, null)
+                    result.success(str?.toDoubleOrNull() ?: defVal)
+                }
+
+                "setDoubleSetting" -> {
+                    val key = call.argument<String>("key") ?: ""
+                    val value = call.argument<Double>("value") ?: 0.0
+                    val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+                    prefs.edit().putString(key, value.toString()).apply()
+                    result.success(true)
+                }
+
+                else -> result.notImplemented()
             }
         }
     }
 
     private fun launchAlarmActivity(args: Map<String, Any?>) {
+        val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+        val soundMode = prefs.getString("sound_mode", "ALWAYS") ?: "ALWAYS"
+        if (soundMode == "TOTAL_SILENCE") {
+            FileLogger.logInfo(this, "🔕 [MainActivity] launchAlarmActivity suprimida por Modo Silencio Total")
+            return
+        }
+
         val intent = Intent(this, AlarmActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                    Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
             putExtra("event_type", args["eventType"]?.toString() ?: "BUY_FILLED")
             putExtra("symbol", args["symbol"]?.toString() ?: "SUI / USDT")
             putExtra("price", args["price"]?.toString() ?: "$1.0020")
@@ -134,6 +273,17 @@ class MainActivity : FlutterActivity() {
             putExtra("projected_profit", args["projectedProfit"]?.toString() ?: "+$9.12 USDT (+6.08%)")
             putExtra("total_profit", args["totalProfit"]?.toString() ?: "+$41.56 USDT")
             putExtra("liquid_cash", args["liquidCash"]?.toString() ?: "$345.84 USDT")
+            putExtra("tp1_price", args["tp1Price"]?.toString() ?: "")
+            putExtra("tp2_price", args["tp2Price"]?.toString() ?: "")
+            putExtra("sl_price", args["slPrice"]?.toString() ?: "")
+            putExtra("limit_buy_price", args["limitBuyPrice"]?.toString() ?: "")
+            putExtra("trade_amount", args["tradeAmount"]?.toString() ?: "100.0")
+            putExtra("buy_price", args["buyPrice"]?.toString() ?: "")
+            putExtra("buy_date", args["buyDate"]?.toString() ?: "")
+            putExtra("sell_date", args["sellDate"]?.toString() ?: "")
+            putExtra("elapsed_time", args["elapsedTime"]?.toString() ?: "")
+            putExtra("app_version", args["appVersion"]?.toString() ?: "V 0.2.17")
+            putExtra("total_coins", args["totalCoins"]?.toString() ?: "")
         }
         startActivity(intent)
     }
@@ -148,6 +298,13 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun scheduleAlarm(delaySeconds: Int, args: Map<String, Any?>) {
+        val prefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+        val soundMode = prefs.getString("sound_mode", "ALWAYS") ?: "ALWAYS"
+        if (soundMode == "TOTAL_SILENCE") {
+            FileLogger.logInfo(this, "🔕 [MainActivity] scheduleAlarm suprimida por Modo Silencio Total")
+            return
+        }
+
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as? AlarmManager ?: return
         val intent = Intent(this, SentinelAlarmReceiver::class.java).apply {
             putExtra("event_type", args["eventType"]?.toString() ?: "BUY_FILLED")
@@ -158,6 +315,17 @@ class MainActivity : FlutterActivity() {
             putExtra("projected_profit", args["projectedProfit"]?.toString() ?: "+$9.12 USDT (+6.08%)")
             putExtra("total_profit", args["totalProfit"]?.toString() ?: "+$41.56 USDT")
             putExtra("liquid_cash", args["liquidCash"]?.toString() ?: "$345.84 USDT")
+            putExtra("tp1_price", args["tp1Price"]?.toString() ?: "")
+            putExtra("tp2_price", args["tp2Price"]?.toString() ?: "")
+            putExtra("sl_price", args["slPrice"]?.toString() ?: "")
+            putExtra("limit_buy_price", args["limitBuyPrice"]?.toString() ?: "")
+            putExtra("trade_amount", args["tradeAmount"]?.toString() ?: "100.0")
+            putExtra("buy_price", args["buyPrice"]?.toString() ?: "")
+            putExtra("buy_date", args["buyDate"]?.toString() ?: "")
+            putExtra("sell_date", args["sellDate"]?.toString() ?: "")
+            putExtra("elapsed_time", args["elapsedTime"]?.toString() ?: "")
+            putExtra("app_version", args["appVersion"]?.toString() ?: "V 0.2.17")
+            putExtra("total_coins", args["totalCoins"]?.toString() ?: "")
         }
 
         val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

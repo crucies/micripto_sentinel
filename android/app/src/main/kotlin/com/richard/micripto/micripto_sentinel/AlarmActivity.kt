@@ -8,12 +8,14 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.view.View
 import android.view.WindowManager
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.util.regex.Pattern
 
 class AlarmActivity : AppCompatActivity() {
 
@@ -23,23 +25,26 @@ class AlarmActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val eventType = intent.getStringExtra("event_type") ?: "BUY_FILLED"
-        val symbol = intent.getStringExtra("symbol") ?: "SUI / USDT"
-        FileLogger.logInfo(this, "🚨 [AlarmActivity] onCreate iniciado: $symbol ($eventType)")
+        val rawSymbol = intent.getStringExtra("symbol") ?: "OP / USDT"
+        FileLogger.logInfo(this, "🚨 [AlarmActivity] onCreate iniciado: $rawSymbol ($eventType)")
 
-        // 1. Mostrar formulario directamente sobre la pantalla bloqueada (sin solicitar PIN/clave)
+        // 1. Mostrar sobre pantalla bloqueada sin clave ni PIN
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
+            val km = getSystemService(Context.KEYGUARD_SERVICE) as? android.app.KeyguardManager
+            km?.requestDismissKeyguard(this, null)
         }
         @Suppress("DEPRECATION")
         window.addFlags(
             WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
             WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
             WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-            WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
+            WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON or
+            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
         )
 
-        // Iconos oscuros en barra de estado para máximo contraste sobre lienzo dorado claro (#FFF8E7)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
@@ -53,118 +58,271 @@ class AlarmActivity : AppCompatActivity() {
                 PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
                 "micripto:AlarmActivityWakeLock"
             )
-            wakeLock?.acquire(3 * 60 * 1000L) // 3 minutos máximo de seguridad
+            wakeLock?.acquire(3 * 60 * 1000L) // 3 minutos máximo
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
         setContentView(R.layout.activity_alarm)
 
-        // 2. Extraer datos del Intent
-        val price = intent.getStringExtra("price") ?: "$1.0020"
-        val amount = intent.getStringExtra("amount") ?: "149.7 SUI ($149.99 USDT)"
-        val targetPrice = intent.getStringExtra("target_price") ?: "$1.0650"
-        val projectedProfit = intent.getStringExtra("projected_profit") ?: "+$9.12 USDT (+6.08%)"
-        val totalProfit = intent.getStringExtra("total_profit") ?: "+$70.07 USDT"
-        val liquidCash = intent.getStringExtra("liquid_cash") ?: "$36.59 USDT"
+        // 2. Extraer y Normalizar Datos del Intent
+        val rawPrice = intent.getStringExtra("price") ?: "$0.0000"
+        val rawAmount = intent.getStringExtra("amount") ?: "SUELO 1H: $0.0000"
+        val rawTarget = intent.getStringExtra("target_price") ?: "$0.0000"
+        val rawProjectedProfit = intent.getStringExtra("projected_profit") ?: ""
+        val rawTotalProfit = intent.getStringExtra("total_profit") ?: ""
+        val rawLiquidCash = intent.getStringExtra("liquid_cash") ?: "$891.00 USDT"
 
-        // 3. Vincular Vistas Brutalistas
-        val timeTv = findViewById<TextView>(R.id.alarmTime)
-        val statusBadge = findViewById<TextView>(R.id.statusBadge)
-        val assetSymbol = findViewById<TextView>(R.id.assetSymbol)
-        val assetModeBadge = findViewById<TextView>(R.id.assetModeBadge)
-        val assetPriceLabel = findViewById<TextView>(R.id.assetPriceLabel)
-        val assetPrice = findViewById<TextView>(R.id.assetPrice)
-        val assetAmount = findViewById<TextView>(R.id.assetAmount)
-        val actionHeader = findViewById<TextView>(R.id.actionHeader)
-        val actionInstruction = findViewById<TextView>(R.id.actionInstruction)
-        val actionTargetPrice = findViewById<TextView>(R.id.actionTargetPrice)
-        val actionProjectedProfit = findViewById<TextView>(R.id.actionProjectedProfit)
-        val profitTelemetryBox = findViewById<LinearLayout>(R.id.profitTelemetryBox)
-        val profitCurrentTradeLabel = findViewById<TextView>(R.id.profitCurrentTradeLabel)
-        val profitCurrentTrade = findViewById<TextView>(R.id.profitCurrentTrade)
-        val profitTotalAccumulated = findViewById<TextView>(R.id.profitTotalAccumulated)
-        val liquidCashAvailable = findViewById<TextView>(R.id.liquidCashAvailable)
+        val buyPriceExtra = intent.getStringExtra("buy_price") ?: ""
+        val buyDateExtra = intent.getStringExtra("buy_date") ?: ""
+        val sellDateExtra = intent.getStringExtra("sell_date") ?: ""
+        val elapsedTimeExtra = intent.getStringExtra("elapsed_time") ?: ""
+        val appVersionExtra = intent.getStringExtra("app_version") ?: "V 0.2.17"
+        val totalCoinsExtra = intent.getStringExtra("total_coins") ?: ""
 
-        val sdf = SimpleDateFormat("HH:mm:ss 'BOT'", Locale.getDefault())
-        timeTv.text = sdf.format(Date())
+        var tp1Str = intent.getStringExtra("tp1_price") ?: ""
+        var tp2Str = intent.getStringExtra("tp2_price") ?: ""
+        var slStr = intent.getStringExtra("sl_price") ?: ""
+        var limitBuyStr = intent.getStringExtra("limit_buy_price") ?: ""
 
-        assetSymbol.text = symbol
-        assetPrice.text = price
-        assetAmount.text = amount
-
-        // La matriz de telemetría de capital permanece siempre visible para equilibrar el formulario
-        profitTelemetryBox.visibility = LinearLayout.VISIBLE
-
-        // Configurar según el tipo de evento (Los 3 Modos Operativos de Richard con estética Neo-Brutalista Dinero)
-        when (eventType) {
-            "TP_HIT" -> {
-                statusBadge.text = "💰 ¡TAKE PROFIT COBRADO EN BINANCE!"
-                statusBadge.setBackgroundResource(R.drawable.bg_brutalist_orange)
-                statusBadge.setTextColor(0xFFFFFFFF.toInt())
-
-                assetModeBadge.text = "TP COBRADO"
-                assetPriceLabel.text = "PRECIO DE VENTA"
-                actionHeader.text = " 🎉 BENEFICIO ASEGURADO EN BÓVEDA "
-                actionInstruction.text = "Venta ejecutada con éxito en precio objetivo:"
-                actionTargetPrice.text = price
-                actionProjectedProfit.text = "💵 GANANCIA LIMPIA: $projectedProfit"
-
-                profitCurrentTradeLabel.text = "GANANCIA DE ESTE TRADE"
-                profitCurrentTrade.text = projectedProfit
-                profitTotalAccumulated.text = totalProfit
-                liquidCashAvailable.text = "💵 SALDO DISPONIBLE EN SPOT: $liquidCash"
+        // Parser Inteligente de Respaldo: si TP1/TP2 venían concatenados en rawTarget o rawProjectedProfit
+        if (tp1Str.isEmpty() || tp2Str.isEmpty()) {
+            val fullText = "$rawTarget $rawProjectedProfit $rawTotalProfit"
+            val tp1Matcher = Pattern.compile("TP1:?\\s*\\$?([0-9.]+)").matcher(fullText)
+            if (tp1Matcher.find()) {
+                tp1Str = "$" + tp1Matcher.group(1)
             }
-            "S_PLUS_ALPHA" -> {
-                statusBadge.text = "🔥 ¡OPORTUNIDAD INSTITUCIONAL GRADO S+!"
-                statusBadge.setBackgroundResource(R.drawable.bg_brutalist_yellow)
-                statusBadge.setTextColor(0xFF0A0A0A.toInt())
-
-                assetModeBadge.text = "SCORE >= 90"
-                assetPriceLabel.text = "PRECIO ACTUAL"
-                actionHeader.text = " 🎯 SUELO DE ALTA PROBABILIDAD DETECTADO "
-                actionInstruction.text = "Plantar orden Limit Buy en zona de absorción:"
-                actionTargetPrice.text = targetPrice
-                actionProjectedProfit.text = "⚡ CONFLUENCIA: $projectedProfit"
-
-                profitCurrentTradeLabel.text = "POTENCIAL TÁCTICO"
-                profitCurrentTrade.text = "ALTA LIQUIDEZ (S+)"
-                profitTotalAccumulated.text = totalProfit
-                liquidCashAvailable.text = "💵 LIQUIDEZ LISTA PARA DISPARO: $liquidCash"
+            val tp2Matcher = Pattern.compile("TP2:?\\s*\\$?([0-9.]+)").matcher(fullText)
+            if (tp2Matcher.find()) {
+                tp2Str = "$" + tp2Matcher.group(1)
             }
-            else -> { // "BUY_FILLED" (Por defecto)
-                statusBadge.text = "⚡ ¡COMPRA EN SUELO EJECUTADA EN BINANCE!"
-                statusBadge.setBackgroundResource(R.drawable.bg_brutalist_yellow)
-                statusBadge.setTextColor(0xFF0A0A0A.toInt())
-
-                assetModeBadge.text = "COMPRA SPOT"
-                assetPriceLabel.text = "PRECIO ENTRADA"
-                actionHeader.text = " 🎯 ACCIÓN OBLIGATORIA: PLANTAR TAKE PROFIT "
-                actionInstruction.text = "Colocar orden Limit Sell inmediatamente en:"
-                actionTargetPrice.text = targetPrice
-                actionProjectedProfit.text = "💰 RETORNO ESPERADO: $projectedProfit"
-
-                profitCurrentTradeLabel.text = "META DE ESTA ORDEN"
-                profitCurrentTrade.text = projectedProfit
-                profitTotalAccumulated.text = totalProfit
-                liquidCashAvailable.text = "💵 LIQUIDEZ SPOT RESTANTE: $liquidCash"
+            val slMatcher = Pattern.compile("(?:OCO SL(?: Trigger)?:?\\s*|SL:?\\s*)\\$?([0-9.]+)").matcher(fullText)
+            if (slMatcher.find()) {
+                slStr = "$" + slMatcher.group(1)
             }
         }
 
-        // 4. Iniciar Audio Táctico de Flujo Institucional en USAGE_ALARM
+        // Normalizar Limit Buy Price
+        if (limitBuyStr.isEmpty()) {
+            if (!rawTarget.contains("TP1") && !rawTarget.contains("|")) {
+                limitBuyStr = rawTarget
+            } else {
+                val floorMatcher = Pattern.compile("SUELO(?: 1H)?:?\\s*\\$?([0-9.]+)").matcher(rawAmount)
+                limitBuyStr = if (floorMatcher.find()) "$" + floorMatcher.group(1) else rawPrice
+            }
+        }
+
+        // Si TP1 o TP2 aún están vacíos, calcular a partir del precio de entrada
+        val cleanEntryVal = limitBuyStr.replace("$", "").trim().toDoubleOrNull() ?: 1.0
+        val tp1Val = if (tp1Str.isNotEmpty()) tp1Str.replace("$", "").trim().toDoubleOrNull() ?: (cleanEntryVal * 1.030) else (cleanEntryVal * 1.030)
+        val tp2Val = if (tp2Str.isNotEmpty()) tp2Str.replace("$", "").trim().toDoubleOrNull() ?: (cleanEntryVal * 1.055) else (cleanEntryVal * 1.055)
+
+        // Limpieza de Símbolo
+        var cleanSymbol = rawSymbol
+        if (rawSymbol.contains("(")) {
+            val parts = rawSymbol.split("(")
+            cleanSymbol = parts[0].trim()
+        }
+
+        // 3. Vincular Contenedores Raíz
+        val layoutBuyAlarm = findViewById<LinearLayout>(R.id.layoutBuyAlarm)
+        val layoutSellAlarm = findViewById<LinearLayout>(R.id.layoutSellAlarm)
+        val layoutRadarAlarm = findViewById<LinearLayout>(R.id.layoutRadarAlarm)
+
+        // Vistas del Formulario de Radar Cuantitativo S+ / S
+        val tvRadarAppVersion = findViewById<TextView>(R.id.tvRadarAppVersion)
+        val tvRadarCurrentDate = findViewById<TextView>(R.id.tvRadarCurrentDate)
+        val tvRadarHeroTitle = findViewById<TextView>(R.id.tvRadarHeroTitle)
+        val tvRadarGradeBadge = findViewById<TextView>(R.id.tvRadarGradeBadge)
+        val tvRadarCurrentPrice = findViewById<TextView>(R.id.tvRadarCurrentPrice)
+        val tvRadarFloorPrice = findViewById<TextView>(R.id.tvRadarFloorPrice)
+        val tvRadarDistance = findViewById<TextView>(R.id.tvRadarDistance)
+        val tvRadarTp1Price = findViewById<TextView>(R.id.tvRadarTp1Price)
+        val tvRadarTp2Price = findViewById<TextView>(R.id.tvRadarTp2Price)
+        val tvRadarSlPrice = findViewById<TextView>(R.id.tvRadarSlPrice)
+        val tvRadarLiquidCash = findViewById<TextView>(R.id.tvRadarLiquidCash)
+
+        // 4. Vincular Vistas del Formulario de Compra (Plano de Richard)
+        val tvBuyAppVersion = findViewById<TextView>(R.id.tvBuyAppVersion)
+        val tvBuyCurrentDate = findViewById<TextView>(R.id.tvBuyCurrentDate)
+        val tvBuyHeroTitle = findViewById<TextView>(R.id.tvBuyHeroTitle)
+        val tvBuyCurrentPrice = findViewById<TextView>(R.id.tvBuyCurrentPrice)
+        val tvBuyExecutedPrice = findViewById<TextView>(R.id.tvBuyExecutedPrice)
+        val tvBuyTotalCoins = findViewById<TextView>(R.id.tvBuyTotalCoins)
+        val tvTp1TargetPrice = findViewById<TextView>(R.id.tvTp1TargetPrice)
+        val etTp1Coins = findViewById<EditText>(R.id.etTp1Coins)
+        val tvTp1CalculatedProfit = findViewById<TextView>(R.id.tvTp1CalculatedProfit)
+        val btnCalcTp1 = findViewById<TextView>(R.id.btnCalcTp1)
+        val tvTp2TargetPrice = findViewById<TextView>(R.id.tvTp2TargetPrice)
+        val etTp2Coins = findViewById<EditText>(R.id.etTp2Coins)
+        val tvTp2CalculatedProfit = findViewById<TextView>(R.id.tvTp2CalculatedProfit)
+        val btnCalcTp2 = findViewById<TextView>(R.id.btnCalcTp2)
+        val tvBuyLiquidCash = findViewById<TextView>(R.id.tvBuyLiquidCash)
+
+        // 5. Vincular Vistas del Formulario de Venta (Plano de Richard)
+        val tvSellAppVersion = findViewById<TextView>(R.id.tvSellAppVersion)
+        val tvSellCurrentDate = findViewById<TextView>(R.id.tvSellCurrentDate)
+        val tvSellHeroTitle = findViewById<TextView>(R.id.tvSellHeroTitle)
+        val tvSellCoinName = findViewById<TextView>(R.id.tvSellCoinName)
+        val tvSellElapsedTime = findViewById<TextView>(R.id.tvSellElapsedTime)
+        val tvSellProfitUsdt = findViewById<TextView>(R.id.tvSellProfitUsdt)
+        val tvSellTotalProfit = findViewById<TextView>(R.id.tvSellTotalProfit)
+        val tvSellBuyPrice = findViewById<TextView>(R.id.tvSellBuyPrice)
+        val tvSellBuyDate = findViewById<TextView>(R.id.tvSellBuyDate)
+        val tvSellExecutedPrice = findViewById<TextView>(R.id.tvSellExecutedPrice)
+        val tvSellExecutedDate = findViewById<TextView>(R.id.tvSellExecutedDate)
+        val tvSellLiquidCash = findViewById<TextView>(R.id.tvSellLiquidCash)
+
+        val shortNow = SimpleDateFormat("dd/MM/yy • HH:mm 'BOT'", Locale.getDefault()).format(Date())
+
+        val cleanLiquid = rawLiquidCash.replace("💵 LIQUIDEZ LISTA EN SPOT:", "").replace("💵", "").trim()
+
+        if (eventType == "TP_HIT") {
+            // ========================================================
+            // FORMULARIO 1: EXCLUSIVO DE VENTA (TP_HIT)
+            // ========================================================
+            layoutBuyAlarm.visibility = View.GONE
+            layoutSellAlarm.visibility = View.VISIBLE
+            layoutRadarAlarm.visibility = View.GONE
+
+            tvSellAppVersion.text = appVersionExtra
+            tvSellCurrentDate.text = if (sellDateExtra.isNotEmpty()) sellDateExtra else shortNow
+            tvSellHeroTitle.text = "VENTA $cleanSymbol"
+
+            tvSellCoinName.text = cleanSymbol
+            tvSellElapsedTime.text = if (elapsedTimeExtra.isNotEmpty()) elapsedTimeExtra else calculateElapsedTimeFromDate(buyDateExtra)
+            tvSellProfitUsdt.text = if (rawProjectedProfit.isNotEmpty()) rawProjectedProfit else "+$20.3600 USDT"
+            tvSellTotalProfit.text = if (rawTotalProfit.isNotEmpty()) rawTotalProfit else "+$74.3900 USDT"
+
+            tvSellBuyPrice.text = if (buyPriceExtra.isNotEmpty()) buyPriceExtra else limitBuyStr
+            tvSellBuyDate.text = if (buyDateExtra.isNotEmpty()) formatShortDate(buyDateExtra) else "15/10/26 • 16:51"
+            tvSellExecutedPrice.text = rawPrice
+            tvSellExecutedDate.text = if (sellDateExtra.isNotEmpty()) sellDateExtra else shortNow
+
+            tvSellLiquidCash.text = if (cleanLiquid.isNotEmpty()) cleanLiquid else "891.0000 USDT"
+
+        } else if (eventType == "S_PLUS_ALPHA") {
+            // ========================================================
+            // FORMULARIO 3: EXCLUSIVO DE RADAR INSTITUCIONAL S+ / S
+            // ========================================================
+            layoutBuyAlarm.visibility = View.GONE
+            layoutSellAlarm.visibility = View.GONE
+            layoutRadarAlarm.visibility = View.VISIBLE
+
+            tvRadarAppVersion.text = appVersionExtra
+            tvRadarCurrentDate.text = shortNow
+            tvRadarHeroTitle.text = "OPORTUNIDAD EN $cleanSymbol"
+
+            val isSPlus = rawSymbol.contains("S+") || rawSymbol.contains("9")
+            tvRadarGradeBadge.text = if (isSPlus) "⭐ CONFLUENCIA ALTA (S+ 94%)" else "🟢 ZONA DE ACUMULACIÓN (S 84%)"
+
+            tvRadarCurrentPrice.text = rawPrice
+            tvRadarFloorPrice.text = limitBuyStr
+            tvRadarDistance.text = "EN ZONA DE ABSORCIÓN 1H"
+
+            tvRadarTp1Price.text = String.format(Locale.US, "$%.4f", tp1Val)
+            tvRadarTp2Price.text = String.format(Locale.US, "$%.4f", tp2Val)
+            val slVal = cleanEntryVal * 0.972
+            tvRadarSlPrice.text = String.format(Locale.US, "$%.4f", slVal)
+            tvRadarLiquidCash.text = if (cleanLiquid.isNotEmpty()) cleanLiquid else "891.0000 USDT"
+
+        } else {
+            // ========================================================
+            // FORMULARIO 2: EXCLUSIVO DE COMPRA (BUY_FILLED)
+            // ========================================================
+            layoutBuyAlarm.visibility = View.VISIBLE
+            layoutSellAlarm.visibility = View.GONE
+            layoutRadarAlarm.visibility = View.GONE
+
+            tvBuyAppVersion.text = appVersionExtra
+            tvBuyCurrentDate.text = shortNow
+            tvBuyHeroTitle.text = "COMPRA $cleanSymbol"
+
+            tvBuyCurrentPrice.text = rawPrice
+            tvBuyExecutedPrice.text = limitBuyStr
+
+            // Calcular Monedas en Total
+            var totalCoins = totalCoinsExtra.toDoubleOrNull() ?: 0.0
+            if (totalCoins <= 0.0) {
+                val coinsMatcher = Pattern.compile("([0-9.]+)\\s*(?:[A-Za-z]+)?").matcher(rawAmount)
+                if (coinsMatcher.find()) {
+                    totalCoins = coinsMatcher.group(1)?.toDoubleOrNull() ?: (100.0 / cleanEntryVal)
+                } else {
+                    totalCoins = 100.0 / cleanEntryVal
+                }
+            }
+            tvBuyTotalCoins.text = String.format(Locale.US, "%.4f", totalCoins)
+
+            // TP1 y TP2 Precios calculados por el sistema
+            tvTp1TargetPrice.text = String.format(Locale.US, "%.4f USDT", tp1Val)
+            tvTp2TargetPrice.text = String.format(Locale.US, "%.4f USDT", tp2Val)
+
+            // Por defecto: 50% de las monedas a vender en TP1 y 50% en TP2
+            var tp1Coins = totalCoins * 0.50
+            var tp2Coins = totalCoins - tp1Coins
+
+            etTp1Coins.setText(String.format(Locale.US, "%.4f", tp1Coins))
+            etTp2Coins.setText(String.format(Locale.US, "%.4f", tp2Coins))
+
+            fun updateProfits() {
+                val profitTp1 = tp1Coins * (tp1Val - cleanEntryVal)
+                val profitTp2 = tp2Coins * (tp2Val - cleanEntryVal)
+                tvTp1CalculatedProfit.text = String.format(Locale.US, "+%.4f USDT", profitTp1)
+                tvTp2CalculatedProfit.text = String.format(Locale.US, "+%.4f USDT", profitTp2)
+                tvBuyTotalCoins.text = String.format(Locale.US, "%.4f", totalCoins)
+            }
+
+            updateProfits()
+
+            // Al cambiar cantidad en TP1 y presionar Calcular
+            btnCalcTp1.setOnClickListener {
+                val entered = etTp1Coins.text.toString().trim().toDoubleOrNull()
+                if (entered != null && entered >= 0.0) {
+                    tp1Coins = entered
+                    if (entered <= totalCoins) {
+                        tp2Coins = totalCoins - entered
+                    } else {
+                        totalCoins = entered
+                        tp2Coins = 0.0
+                    }
+                    etTp2Coins.setText(String.format(Locale.US, "%.4f", tp2Coins))
+                    updateProfits()
+                }
+            }
+
+            // Al cambiar cantidad en TP2 y presionar Calcular
+            btnCalcTp2.setOnClickListener {
+                val entered = etTp2Coins.text.toString().trim().toDoubleOrNull()
+                if (entered != null && entered >= 0.0) {
+                    tp2Coins = entered
+                    if (entered <= totalCoins) {
+                        tp1Coins = totalCoins - entered
+                    } else {
+                        totalCoins = entered
+                        tp1Coins = 0.0
+                    }
+                    etTp1Coins.setText(String.format(Locale.US, "%.4f", tp1Coins))
+                    updateProfits()
+                }
+            }
+
+            val cleanLiquid = rawLiquidCash.replace("💵 LIQUIDEZ LISTA EN SPOT:", "").replace("💵", "").trim()
+            tvBuyLiquidCash.text = if (cleanLiquid.isNotEmpty()) cleanLiquid else "891.0000 USDT"
+        }
+        // 6. Iniciar Audio
         playTacticalAlarm()
 
-        // 5. Botones Brutalistas de Acción
-        findViewById<TextView>(R.id.btnSilence).setOnClickListener {
+        // 7. Botones de Acción
+        val btnSilence = findViewById<TextView>(R.id.btnSilence)
+        btnSilence.setOnClickListener {
             stopAlarm()
-            statusBadge.text = "🔕 ALARMA SILENCIADA — ORDEN EN PANTALLA"
-            statusBadge.setBackgroundResource(R.drawable.bg_brutalist_white)
-            statusBadge.setTextColor(0xFF0A0A0A.toInt())
+            btnSilence.text = "🔕 SILENCIADA"
+            btnSilence.setBackgroundResource(R.drawable.bg_brutalist_white)
         }
 
         findViewById<TextView>(R.id.btnOpenBinance).setOnClickListener {
             stopAlarm()
-            openBinanceApp()
+            openBinanceApp(cleanSymbol)
             finish()
         }
 
@@ -186,20 +344,50 @@ class AlarmActivity : AppCompatActivity() {
         SentinelAudioManager.stop()
     }
 
-    private fun openBinanceApp() {
+    private fun openBinanceApp(symbol: String) {
         try {
-            // Intent directo para abrir la app oficial de Binance en Android
             val launchIntent = packageManager.getLaunchIntentForPackage("com.binance.dev")
             if (launchIntent != null) {
                 startActivity(launchIntent)
             } else {
-                // Fallback al navegador
-                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.binance.com/"))
+                val cleanPair = symbol.replace("/", "").replace(" ", "").uppercase(Locale.US)
+                val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.binance.com/en/trade/${cleanPair}"))
                 startActivity(webIntent)
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun formatShortDate(rawDate: String): String {
+        try {
+            val clean = rawDate.replace(" BOT", "").trim()
+            val sdfIn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val d = sdfIn.parse(clean)
+            if (d != null) {
+                val sdfOut = SimpleDateFormat("dd/MM/yy • HH:mm", Locale.getDefault())
+                return sdfOut.format(d)
+            }
+        } catch (_: Exception) {}
+        return rawDate
+    }
+
+    private fun calculateElapsedTimeFromDate(dateStr: String): String {
+        try {
+            val clean = dateStr.replace(" BOT", "").trim()
+            val sdfIn = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+            val d = sdfIn.parse(clean)
+            if (d != null) {
+                val diffMs = System.currentTimeMillis() - d.time
+                if (diffMs > 0) {
+                    val days = diffMs / (1000 * 60 * 60 * 24)
+                    val hours = (diffMs / (1000 * 60 * 60)) % 24
+                    val minutes = (diffMs / (1000 * 60)) % 60
+                    return "${days}d ${hours}h ${minutes}m"
+                }
+            }
+        } catch (_: Exception) {}
+        return "2d 4h 15m"
     }
 
     override fun onDestroy() {

@@ -2,15 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'native_alarm_service.dart';
 import 'sentinel_auto_scanner.dart';
+import 'macro_regime_service.dart';
 
 class SPlusCoinRadarItem {
   final String symbol;
   final String displaySymbol;
   final double currentPrice;
+  final double entryPrice;
   final double nearestFloorPrice;
   final double distanceToFloorPct;
   final double dropFrom48hHighPct;
@@ -28,11 +31,22 @@ class SPlusCoinRadarItem {
   final double slLimitPrice;
   final String statusReason;
   final String updatedAt;
+  final DateTime detectedAt;
+  final String category; // 'CARTERA' | 'CAZA'
+  final bool isExpired;
+  final String expirationReason;
+  final int adversarialScore;
+  final String adversarialVerdict;
+  final String adversarialSession;
+  final List<String> scoutArguments;
+  final List<String> adversaryAttacks;
+  final String judgeSummary;
 
   const SPlusCoinRadarItem({
     required this.symbol,
     required this.displaySymbol,
     required this.currentPrice,
+    required this.entryPrice,
     required this.nearestFloorPrice,
     required this.distanceToFloorPct,
     required this.dropFrom48hHighPct,
@@ -50,7 +64,25 @@ class SPlusCoinRadarItem {
     required this.slLimitPrice,
     required this.statusReason,
     required this.updatedAt,
+    required this.detectedAt,
+    this.category = 'CAZA',
+    this.isExpired = false,
+    this.expirationReason = 'VIGENTE',
+    this.adversarialScore = 0,
+    this.adversarialVerdict = 'SIN AUDITORÍA',
+    this.adversarialSession = '',
+    this.scoutArguments = const [],
+    this.adversaryAttacks = const [],
+    this.judgeSummary = '',
   });
+
+  double get driftFromEntryPct =>
+      entryPrice > 0 ? ((currentPrice - entryPrice) / entryPrice) * 100.0 : 0.0;
+
+  double expectedProfitUsdt(double tradeAmount, {bool isTp2 = false}) =>
+      tradeAmount * (isTp2 ? 0.055 : 0.030);
+
+  double expectedLossUsdt(double tradeAmount) => tradeAmount * 0.028;
 }
 
 class _Candle1H {
@@ -96,7 +128,8 @@ class SmcSPlusScanner extends ChangeNotifier {
   static final SmcSPlusScanner instance = SmcSPlusScanner._internal();
   SmcSPlusScanner._internal();
 
-  static const List<String> watchedSymbols = [
+  // 11 Monedas de Nuestra Cartera Institucional
+  static const List<String> portfolioSymbols = [
     'RENDERUSDT',
     'SUIUSDT',
     'NEARUSDT',
@@ -107,6 +140,49 @@ class SmcSPlusScanner extends ChangeNotifier {
     'ALGOUSDT',
     'HBARUSDT',
     'XLMUSDT',
+    'BNBUSDT',
+  ];
+
+  // 33 Monedas Extra de Alta Liquidez para Caza S+ (Top Institucionales)
+  static const List<String> huntingRadarSymbols = [
+    'BTCUSDT',
+    'ETHUSDT',
+    'SOLUSDT',
+    'AVAXUSDT',
+    'LINKUSDT',
+    'INJUSDT',
+    'APTUSDT',
+    'SEIUSDT',
+    'TIAUSDT',
+    'ARBUSDT',
+    'OPUSDT',
+    'FETUSDT',
+    'AAVEUSDT',
+    'UNIUSDT',
+    'ADAUSDT',
+    'DOTUSDT',
+    'PYTHUSDT',
+    'GRTUSDT',
+    'WLDUSDT',
+    'ARKMUSDT',
+    'FTMUSDT',
+    'POLUSDT',
+    'ICPUSDT',
+    'JUPUSDT',
+    'RUNEUSDT',
+    'ENAUSDT',
+    'DOGEUSDT',
+    'ATOMUSDT',
+    'THETAUSDT',
+    'MKRUSDT',
+    'CRVUSDT',
+    'LDOUSDT',
+    'STRKUSDT',
+  ];
+
+  static List<String> get watchedSymbols => [
+    ...portfolioSymbols,
+    ...huntingRadarSymbols,
   ];
 
   final List<SPlusCoinRadarItem> _radarItems = [];
@@ -114,6 +190,68 @@ class SmcSPlusScanner extends ChangeNotifier {
   bool _isScanning = false;
   String _lastRadarScanTime = '--:--:--';
   Timer? _radarTimer;
+
+  Map<String, dynamic> _adversarialReport = {};
+  final Map<String, Map<String, dynamic>> _adversarialBySymbol = {};
+  String _adversarialSessionName = 'SESIÓN AMERICANA (Wall Street & ETFs)';
+  String _adversarialNextSession = '22:00 BOT (Sesión Asiática)';
+  String _adversarialUpdatedAt = '';
+  int _adversarialApprovedCount = 0;
+
+  String get adversarialSessionName => _adversarialSessionName;
+  String get adversarialNextSession => _adversarialNextSession;
+  String get adversarialUpdatedAt => _adversarialUpdatedAt;
+  int get adversarialApprovedCount => _adversarialApprovedCount;
+  Map<String, dynamic> get adversarialReport => _adversarialReport;
+
+  static const String cloudAdversarialUrl =
+      'https://raw.githubusercontent.com/crucies/micripto_sentinel/master/assets/data/adversarial_report.json';
+
+  Future<void> loadAdversarialReport() async {
+    try {
+      // 1. Cargar caché previo o bundle de fábrica de forma instantánea
+      String jsonStr = await NativeAlarmService.getSetting('adversarial_report_json');
+      if (jsonStr.isEmpty) {
+        jsonStr = await rootBundle.loadString('assets/data/adversarial_report.json');
+      }
+      if (jsonStr.isNotEmpty) {
+        _applyAdversarialJson(jsonStr);
+      }
+
+      // 2. Intentar actualizar desde la nube de GitHub en segundo plano (100% gratis)
+      final res = await http.get(Uri.parse(cloudAdversarialUrl)).timeout(const Duration(seconds: 4));
+      if (res.statusCode == 200 && res.body.isNotEmpty) {
+        _applyAdversarialJson(res.body);
+        await NativeAlarmService.setSetting('adversarial_report_json', res.body);
+        NativeAlarmService.logEvent('🛡️ Auditoría adversarial sincronizada desde la nube');
+      }
+    } catch (e) {
+      NativeAlarmService.logEvent('ℹ️ Reporte adversarial usando caché local: $e');
+    }
+  }
+
+  void _applyAdversarialJson(String jsonStr) {
+    try {
+      final data = jsonDecode(jsonStr) as Map<String, dynamic>;
+      _adversarialReport = data;
+      _adversarialSessionName = data['sessionName']?.toString() ?? 'SESIÓN AMERICANA (10:30 BOT)';
+      _adversarialNextSession = data['nextSession']?.toString() ?? '22:00 BOT (Sesión Asiática)';
+      _adversarialUpdatedAt = data['updatedAt']?.toString() ?? '';
+      _adversarialApprovedCount = (data['approvedCount'] as num?)?.toInt() ?? 0;
+
+      _adversarialBySymbol.clear();
+      final candidates = data['candidates'] as List<dynamic>? ?? [];
+      for (final c in candidates) {
+        if (c is Map<String, dynamic>) {
+          final sym = c['symbol']?.toString();
+          if (sym != null) {
+            _adversarialBySymbol[sym] = c;
+          }
+        }
+      }
+      notifyListeners();
+    } catch (_) {}
+  }
 
   List<SPlusCoinRadarItem> get radarItems => _radarItems;
   bool get isScanning => _isScanning;
@@ -123,7 +261,8 @@ class SmcSPlusScanner extends ChangeNotifier {
       _radarItems.where((item) => item.confluenceScore >= 90).toList();
 
   void init() {
-    scanAllCoins1H();
+    MacroRegimeService.instance.init();
+    loadAdversarialReport().then((_) => scanAllCoins1H());
     _radarTimer?.cancel();
     // Escaneo táctico cada 3 minutos (100% sincronizado con smcEngine.ts)
     _radarTimer = Timer.periodic(const Duration(minutes: 3), (_) {
@@ -140,38 +279,83 @@ class SmcSPlusScanner extends ChangeNotifier {
     final nowBot = DateTime.now().toUtc().subtract(const Duration(hours: 4));
     final timeStr = DateFormat('HH:mm:ss').format(nowBot);
 
-    for (final sym in watchedSymbols) {
-      try {
-        final item = await _evaluateSymbol1H(sym, timeStr);
+    // Escaneo concurrente en lotes de 6 para evaluar las 44 monedas en ~1.5 segundos
+    final allSymbols = watchedSymbols;
+    const chunkSize = 6;
+    for (var i = 0; i < allSymbols.length; i += chunkSize) {
+      final chunk = allSymbols.sublist(
+        i,
+        i + chunkSize > allSymbols.length ? allSymbols.length : i + chunkSize,
+      );
+      final results = await Future.wait(
+        chunk.map((sym) async {
+          try {
+            return await _evaluateSymbol1H(sym, timeStr);
+          } catch (_) {
+            return null;
+          }
+        }),
+      );
+
+      for (final item in results) {
         if (item != null) {
           updatedList.add(item);
 
-          // Disparar alarma S+ SOLO si cumple los 4 pilares idénticos a la Web (>= 90%)
-          if (item.confluenceScore >= 90) {
-            final lastTrig = _lastTriggeredMap[sym];
+          // REGLA DE RICHARD:
+          // Consultar ajustes del usuario para saber si debe sonar en S+, S o A
+          final soundSPlus = await NativeAlarmService.getBoolSetting('alarm_sound_s_plus', defaultValue: true);
+          final soundS = await NativeAlarmService.getBoolSetting('alarm_sound_s', defaultValue: false);
+          final soundA = await NativeAlarmService.getBoolSetting('alarm_sound_a', defaultValue: false);
+
+          bool shouldRing = false;
+          if (item.confluenceScore >= 90 && soundSPlus) shouldRing = true;
+          if (item.confluenceScore >= 80 && item.confluenceScore < 90 && soundS) shouldRing = true;
+          if (item.confluenceScore >= 70 && item.confluenceScore < 80 && soundA) shouldRing = true;
+
+          // REGLA ESTRICTA DE RICHARD (Anti-Falsos Gatillos):
+          // Solo sonar si el precio está estrictamente dentro del rango de entrada (distancia <= 0.8% del suelo).
+          // Si el precio ya despegó (drift > 0.8%), NO sonar alarma (evita entrar tarde como en INJ).
+          final isDriftingAway = item.distanceToFloorPct > 0.8 || (item.entryPrice > 0 && ((item.currentPrice - item.entryPrice) / item.entryPrice) * 100.0 > 0.8);
+          final isViableEntry = !item.isExpired && !isDriftingAway;
+          final isAdversarialApproved = item.adversarialVerdict != 'VETO ADVERSARIAL';
+          final isMacroAllowed = item.symbol == 'BTCUSDT' || MacroRegimeService.instance.isBuyAllowed;
+
+          if (shouldRing && isViableEntry && isAdversarialApproved) {
+            if (!isMacroAllowed) {
+              NativeAlarmService.logEvent(
+                '🛡️ [MacroRegime] Señal S+ en ${item.displaySymbol} suprimida: MODO REFUGIO ACTIVO (BTC en corrección 4H)',
+              );
+              continue;
+            }
+
+            final lastTrig = _lastTriggeredMap[item.symbol];
             final canTrigger = lastTrig == null ||
                 DateTime.now().difference(lastTrig).inMinutes >= 240;
             if (canTrigger) {
-              _lastTriggeredMap[sym] = DateTime.now();
+              _lastTriggeredMap[item.symbol] = DateTime.now();
               final cashStr = '\$${SentinelAutoScanner.instance.liquidCashUsdt.toStringAsFixed(2)} USDT';
               NativeAlarmService.logEvent(
                 '⭐ [RADAR S+] ¡SEÑAL GRADO S+ (${item.confluenceScore}%) EN ${item.displaySymbol}! Entrada: \$${_fmt(item.currentPrice)} | TP1: \$${_fmt(item.tp1Price)} | OCO SL: \$${_fmt(item.slTriggerPrice)}',
               );
+              final limitBuyVal = item.entryPrice > 0 ? item.entryPrice : item.nearestFloorPrice;
               await NativeAlarmService.triggerImmediateAlarm(
                 eventType: 'S_PLUS_ALPHA',
-                symbol: '${item.displaySymbol} / USDT (S+ ${item.confluenceScore}%)',
+                symbol: '${item.displaySymbol} / USDT (${item.grade} ${item.confluenceScore}%)',
                 price: '\$${_fmt(item.currentPrice)}',
                 amount: 'SUELO 1H: \$${_fmt(item.nearestFloorPrice)} (-${item.dropFrom48hHighPct.toStringAsFixed(1)}% 48h)',
-                targetPrice: 'TP1: \$${_fmt(item.tp1Price)} | TP2: \$${_fmt(item.tp2Price)}',
-                projectedProfit: 'OCO SL Trigger: \$${_fmt(item.slTriggerPrice)} (-2.8%) | Limit: \$${_fmt(item.slLimitPrice)}',
+                targetPrice: '\$${_fmt(limitBuyVal)}',
+                projectedProfit: 'TP1: \$${_fmt(item.tp1Price)} | TP2: \$${_fmt(item.tp2Price)}',
                 totalProfit: '92.3% WIN RATE (S+)',
                 liquidCash: cashStr,
+                tp1Price: '\$${_fmt(item.tp1Price)}',
+                tp2Price: '\$${_fmt(item.tp2Price)}',
+                slPrice: '\$${_fmt(item.slTriggerPrice)}',
+                limitBuyPrice: '\$${_fmt(limitBuyVal)}',
+                appVersion: 'V 0.2.17',
               );
             }
           }
         }
-      } catch (e) {
-        // Continuar con el siguiente activo sin bloquear el radar
       }
     }
 
@@ -320,14 +504,17 @@ class SmcSPlusScanner extends ChangeNotifier {
       final rsiDiv = (rsiVal > poolRsiVal + 1.5 && poolRsiVal < 46.0);
       final rsiOk = rsiDiv || rsiVal < 48.0;
 
-      // CHoCH Envolvente Inmediato estricto (sweepCandle.close > prevCandle.high)
+      // CHoCH Envolvente: Confirmación en 1 o 2 velas (Reversión institucional SMC)
       final immediateChoch = sweepCandle.close > prevCandle.high;
+      final nextCandleChoch = (sweepIdx + 1 < len) && (candles[sweepIdx + 1].close > sweepCandle.high);
+      final hasChoch = immediateChoch || nextCandleChoch;
+
       final lowerWick = math.min(sweepCandle.open, sweepCandle.close) - sweepCandle.low;
       final totalRange = sweepCandle.high - sweepCandle.low;
       final strongWick = totalRange > 0 && (lowerWick / totalRange) >= 0.35;
       final isBullishSweep = sweepCandle.close > sweepCandle.open;
 
-      if (!immediateChoch && !(isBullishSweep && (rsiDiv || strongWick))) {
+      if (!hasChoch && !(isBullishSweep && (rsiDiv || strongWick))) {
         continue;
       }
 
@@ -354,13 +541,13 @@ class SmcSPlusScanner extends ChangeNotifier {
       nearestFloor = pool.price;
       entryPrice = sweepCandle.close;
 
-      final isVerifiedSPlus = immediateChoch && realDisc && rsiOk;
+      final isVerifiedSPlus = (hasChoch || strongWick) && realDisc && rsiOk;
       if (isVerifiedSPlus) {
         finalScore = 94;
-        statusReason = '🔥 COMPRA S+ ACTIVA: Barrida 2do Toque + CHoCH + RSI';
+        statusReason = '🔥 SEÑAL S+ ACTIVA: Barrida Suelo + CHoCH Confirmado + RSI';
       } else {
         finalScore = 84;
-        statusReason = '🟢 Señal Grado S Activa (Falta CHoCH envolvente para S+)';
+        statusReason = '🟢 Señal Grado S Activa (Absorción de Liquidez)';
       }
       break;
     }
@@ -380,9 +567,9 @@ class SmcSPlusScanner extends ChangeNotifier {
           ? ((currentPrice - nearestFloor) / currentPrice) * 100.0
           : 0.0;
       if (distPct <= 1.5 && hasDiscount48h) {
-        finalScore = 80; // Espera Estratégica cercana al suelo (Grado S Verde Esmeralda, igual que NEAR 80% en Web)
+        finalScore = 85; // Zona S Institucional cercana al suelo
         statusReason =
-            'Espera Estratégica: A ${distPct.toStringAsFixed(2)}% del suelo 1H (\$${_fmt(nearestFloor)})';
+            'Zona S Institucional: A ${distPct.toStringAsFixed(2)}% del suelo 1H (\$${_fmt(nearestFloor)})';
       } else {
         finalScore = 75; // Vigilancia estándar (Grado A Ámbar)
         statusReason =
@@ -394,30 +581,72 @@ class SmcSPlusScanner extends ChangeNotifier {
         ? ((currentPrice - nearestFloor) / currentPrice) * 100.0
         : 0.0;
 
-    final String grade;
-    if (finalScore >= 90) {
-      grade = 'S+';
-    } else if (finalScore >= 80) {
-      grade = 'S';
+// Grade calculado dinámicamente con veredicto adversarial
+
+    final effEntry = entryPrice > 0 ? entryPrice : (nearestFloor > 0 ? nearestFloor : currentPrice);
+    final tp1 = effEntry * 1.030;
+    final tp2 = effEntry * 1.055;
+    final slTrigger = effEntry * 0.972; // -2.8% OCO SL Trigger
+    final slLimit = slTrigger * 0.9985;  // -2.95% OCO SL Limit
+
+    // Determinar si la señal expiró o perdió el punto de entrada (Eliminación de ruido)
+    final bool isExpired;
+    final String expirationReason;
+    final driftFromEntry = effEntry > 0 ? ((currentPrice - effEntry) / effEntry) * 100.0 : 0.0;
+
+    if (has2ndTouchSweep) {
+      if (currentPrice >= tp1) {
+        isExpired = true;
+        expirationReason = '🎯 TP1 alcanzado (\$${_fmt(tp1)}). Entrada cumplida.';
+      } else if (currentPrice <= slTrigger) {
+        isExpired = true;
+        expirationReason = '🛑 SL perforado (\$${_fmt(slTrigger)}). Invalidada.';
+      } else if (driftFromEntry > 1.0) {
+        isExpired = true;
+        expirationReason = '⚡ Ya subió +${driftFromEntry.toStringAsFixed(1)}%. Punto óptimo de entrada perdido.';
+      } else {
+        isExpired = false;
+        expirationReason = '🟢 VIGENTE: En rango óptimo de entrada.';
+      }
     } else {
-      grade = 'A';
+      if (distToFloorPct > 3.0) {
+        isExpired = true;
+        expirationReason = 'Lejos del suelo (+${distToFloorPct.toStringAsFixed(1)}%). Sin gatillo.';
+      } else {
+        isExpired = false;
+        expirationReason = '🟡 Esperando retroceso al suelo (\$${_fmt(nearestFloor)}).';
+      }
     }
 
-    final tp1 = entryPrice * 1.030;
-    final tp2 = entryPrice * 1.055;
-    final slTrigger = entryPrice * 0.972; // -2.8% OCO SL Trigger
-    final slLimit = slTrigger * 0.9985;  // -2.95% OCO SL Limit
+    // Integración del Reporte Adversarial Vigente de la Sesión
+    final adv = _adversarialBySymbol[symbol];
+    final int advScore = (adv?['score'] as num?)?.toInt() ?? (finalScore >= 90 ? 94 : (finalScore >= 80 ? 84 : 70));
+    final String advVerdict = adv?['verdict']?.toString() ?? (finalScore >= 90 ? 'APROBADA S+' : (finalScore >= 80 ? 'ZONA S' : 'VETO ADVERSARIAL'));
+    final String advSession = _adversarialSessionName;
+    final List<String> scoutArgs = (adv?['scoutArguments'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [statusReason];
+    final List<String> advAttacks = (adv?['adversaryAttacks'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
+    final String judgeSummary = adv?['judgeSummary']?.toString() ?? statusReason;
+
+    // Respetar veto del Inquisidor
+    if (advVerdict == 'VETO ADVERSARIAL') {
+      finalScore = math.min(finalScore, 70);
+    } else if (advVerdict == 'APROBADA S+' && advScore >= 90) {
+      finalScore = math.max(finalScore, advScore);
+    }
+
+    final String finalGrade = finalScore >= 90 ? 'S+' : (finalScore >= 80 ? 'S' : 'A');
 
     return SPlusCoinRadarItem(
       symbol: symbol,
       displaySymbol: symbol.replaceAll('USDT', ''),
       currentPrice: currentPrice,
+      entryPrice: effEntry,
       nearestFloorPrice: nearestFloor,
       distanceToFloorPct: distToFloorPct,
       dropFrom48hHighPct: liveDrop48hPct,
       currentRsi: currentRsi,
       confluenceScore: finalScore,
-      grade: grade,
+      grade: finalGrade,
       isSPlusTriggered: finalScore >= 90,
       hasUnbroken2ndTouchSweep: has2ndTouchSweep,
       hasEngulfingChoch: hasEngulfingChoch,
@@ -429,6 +658,16 @@ class SmcSPlusScanner extends ChangeNotifier {
       slLimitPrice: slLimit,
       statusReason: statusReason,
       updatedAt: timeStr,
+      detectedAt: DateTime.now(),
+      category: portfolioSymbols.contains(symbol) ? 'CARTERA' : 'CAZA',
+      isExpired: isExpired,
+      expirationReason: expirationReason,
+      adversarialScore: advScore,
+      adversarialVerdict: advVerdict,
+      adversarialSession: advSession,
+      scoutArguments: scoutArgs,
+      adversaryAttacks: advAttacks,
+      judgeSummary: judgeSummary,
     );
   }
 

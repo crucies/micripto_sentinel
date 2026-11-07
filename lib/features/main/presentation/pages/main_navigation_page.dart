@@ -3,6 +3,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../dashboard/presentation/pages/dashboard_page.dart';
 import '../../../radar/presentation/pages/radar_s_plus_page.dart';
 import '../../../settings/presentation/pages/settings_page.dart';
+import '../../../reports/presentation/pages/profit_reports_page.dart';
 
 class MainNavigationPage extends StatefulWidget {
   const MainNavigationPage({super.key});
@@ -17,6 +18,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
   final List<Widget> _pages = const [
     DashboardPage(),
     RadarSPlusPage(),
+    ProfitReportsPage(),
     SettingsPage(),
   ];
 
@@ -30,7 +32,7 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
       ),
       bottomNavigationBar: SafeArea(
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+          padding: const EdgeInsets.fromLTRB(10, 8, 10, 12),
           decoration: const BoxDecoration(
             color: AppColors.background,
             border: Border(
@@ -47,19 +49,28 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
                   activeColor: AppColors.gold,
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 6),
               Expanded(
                 child: _buildBrutalistNavTab(
                   index: 1,
                   icon: Icons.radar,
-                  label: 'RADAR S+',
+                  label: 'RADAR',
                   activeColor: const Color(0xFF00E5FF),
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 6),
               Expanded(
                 child: _buildBrutalistNavTab(
                   index: 2,
+                  icon: Icons.bar_chart_rounded,
+                  label: 'REPORTES',
+                  activeColor: AppColors.gold,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _buildBrutalistNavTab(
+                  index: 3,
                   icon: Icons.tune,
                   label: 'AJUSTES',
                   activeColor: AppColors.gold,
@@ -102,20 +113,26 @@ class _MainNavigationPageState extends State<MainNavigationPage> {
           children: [
             Icon(
               icon,
-              size: 16,
+              size: 15,
               color: AppColors.ink,
             ),
-            const SizedBox(width: 5),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'monospace',
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.bold,
-                fontSize: 11,
-                color: AppColors.ink,
-                letterSpacing: 0.2,
+            if (isSelected) ...[
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.w900,
+                    fontSize: 9.5,
+                    color: AppColors.ink,
+                    letterSpacing: -0.2,
+                  ),
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),

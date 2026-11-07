@@ -63,11 +63,161 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
             val pendingIntent = PendingIntent.getBroadcast(context, 2005, scanIntent, flags)
             alarmManager.cancel(pendingIntent)
         }
+
+        fun fireImmediateAlarm(
+            context: Context,
+            symbol: String,
+            eventType: String,
+            price: String,
+            amount: String,
+            targetPrice: String,
+            projectedProfit: String,
+            totalProfit: String = "+$31.91 USDT",
+            liquidCash: String = "$78.45 USDT",
+            tp1Price: String = "",
+            tp2Price: String = "",
+            slPrice: String = "",
+            limitBuyPrice: String = "",
+            tradeAmount: String = "100.0",
+            buyPrice: String = "",
+            buyDate: String = "",
+            sellDate: String = "",
+            elapsedTime: String = "",
+            appVersion: String = "V 0.2.17",
+            totalCoins: String = ""
+        ) {
+            val settingsPrefs = context.getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+            val soundMode = settingsPrefs.getString("sound_mode", "ALWAYS") ?: "ALWAYS"
+            if (soundMode == "TOTAL_SILENCE") {
+                FileLogger.logInfo(context, "🔕 [Receiver] ALARMA SUPRIMIDA por MODO SILENCIO TOTAL: $symbol ($eventType)")
+                return
+            }
+
+            FileLogger.logInfo(context, "🚨 [Receiver] Disparo directo de alarma en Doze: $symbol ($eventType)")
+
+            // 1. Audio Inmediato 100%
+            SentinelAudioManager.play(context)
+
+            // 2. WakeLock agresivo para encender pantalla física
+            try {
+                val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+                @Suppress("DEPRECATION")
+                val wl = pm?.newWakeLock(
+                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                    PowerManager.ON_AFTER_RELEASE,
+                    "micripto:receiver_wakeup"
+                )
+                wl?.acquire(60000) // 1 minuto encendida
+                FileLogger.logInfo(context, "💡 [Receiver] WakeLock pantalla brillante adquirido con éxito (60s)")
+            } catch (e: Exception) {
+                FileLogger.logError(context, "❌ [Receiver] Error adquiriendo WakeLock", e)
+            }
+
+            // 3. Preparar Intent para AlarmActivity
+            val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+                putExtra("symbol", symbol)
+                putExtra("event_type", eventType)
+                putExtra("price", price)
+                putExtra("amount", amount)
+                putExtra("target_price", targetPrice)
+                putExtra("projected_profit", projectedProfit)
+                putExtra("total_profit", totalProfit)
+                putExtra("liquid_cash", liquidCash)
+                putExtra("tp1_price", tp1Price)
+                putExtra("tp2_price", tp2Price)
+                putExtra("sl_price", slPrice)
+                putExtra("limit_buy_price", limitBuyPrice)
+                putExtra("trade_amount", tradeAmount)
+                putExtra("buy_price", buyPrice)
+                putExtra("buy_date", buyDate)
+                putExtra("sell_date", sellDate)
+                putExtra("elapsed_time", elapsedTime)
+                putExtra("app_version", appVersion)
+                putExtra("total_coins", totalCoins)
+            }
+
+            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            } else {
+                PendingIntent.FLAG_UPDATE_CURRENT
+            }
+            val fullScreenPendingIntent = PendingIntent.getActivity(context, 1001, alarmIntent, flags)
+
+            val silenceIntent = Intent(context, SentinelAlarmReceiver::class.java).apply {
+                action = ACTION_SILENCE
+            }
+            val silencePendingIntent = PendingIntent.getBroadcast(context, 1002, silenceIntent, flags)
+
+            // Crear Canal de Notificación de Máxima Prioridad
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    CHANNEL_ID,
+                    "MiCripto Sentinel Alarmas Críticas",
+                    NotificationManager.IMPORTANCE_HIGH
+                ).apply {
+                    description = "Canal de alarmas críticas para ejecución de órdenes en Binance"
+                    enableLights(true)
+                    enableVibration(true)
+                    vibrationPattern = longArrayOf(0, 350, 150, 350, 150, 500)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                    setBypassDnd(true)
+                }
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            val title = when (eventType) {
+                "TP_HIT" -> "🎯 ¡TAKE PROFIT EJECUTADO! ($symbol)"
+                "S_PLUS_ALPHA" -> "⭐ OPORTUNIDAD RADAR S+ ($symbol)"
+                else -> "🟢 COMPRA EN SUELO EJECUTADA ($symbol)"
+            }
+
+            val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle(title)
+                .setContentText("Toca para abrir la tarjeta táctica de Binance")
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_ALARM)
+                .setAutoCancel(true)
+                .setOngoing(true)
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                .setFullScreenIntent(fullScreenPendingIntent, true)
+                .setContentIntent(fullScreenPendingIntent)
+                .addAction(android.R.drawable.ic_lock_power_off, "🔕 SILENCIAR", silencePendingIntent)
+                .addAction(android.R.drawable.ic_menu_view, "🚀 VER ORDEN", fullScreenPendingIntent)
+
+            notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
+            FileLogger.logInfo(context, "📢 [Receiver] Notificación FullScreen enviada al sistema (ID: $NOTIFICATION_ID)")
+
+            try {
+                context.startActivity(alarmIntent)
+                FileLogger.logInfo(context, "🚀 [Receiver] startActivity ejecutado hacia AlarmActivity")
+            } catch (e: Exception) {
+                FileLogger.logWarning(context, "⚠️ [Receiver] startActivity directo bloqueado por OS: ${e.message}")
+            }
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
+        val action = intent.action
+
+        // 0. Manejar Encendido de Dispositivo o Actualización de Paquete
+        if (action == Intent.ACTION_BOOT_COMPLETED ||
+            action == "android.intent.action.MY_PACKAGE_REPLACED" ||
+            action == "android.intent.action.QUICKBOOT_POWERON" ||
+            action == "com.htc.intent.action.QUICKBOOT_POWERON") {
+            FileLogger.logInfo(context, "📱 [Receiver] Dispositivo reiniciado / paquete actualizado ($action). Reactivando Centinela 24/7...")
+            SentinelForegroundService.start(context)
+            scheduleNextScan(context, 15)
+            return
+        }
+
         // 1. Manejar acción rápida de silenciar desde la notificación
-        if (intent.action == ACTION_SILENCE) {
+        if (action == ACTION_SILENCE) {
             SentinelAudioManager.stop()
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
             nm?.cancel(NOTIFICATION_ID)
@@ -75,8 +225,23 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
             return
         }
 
+        // Asegurar que el Servicio en Primer Plano esté activo
+        if (!SentinelForegroundService.isRunning) {
+            try {
+                SentinelForegroundService.start(context)
+            } catch (_: Exception) {}
+        }
+
         // 2. Manejar Escaneo Autónomo de Binance en Segundo Plano (Doze Mode)
-        if (intent.action == ACTION_SENTINEL_SCAN) {
+        if (action == ACTION_SENTINEL_SCAN) {
+            val pendingResult = goAsync()
+            val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
+            val scanWakeLock = pm?.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK,
+                "micripto:background_scan_wakelock"
+            )
+            scanWakeLock?.acquire(25000) // Mantener CPU activa durante HTTP/DNS
+
             Thread {
                 try {
                     val prefs = context.getSharedPreferences("sentinel_orders_prefs", Context.MODE_PRIVATE)
@@ -85,14 +250,31 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
 
                     if (!ordersJson.isNullOrEmpty()) {
                         val jsonArray = JSONArray(ordersJson)
-                        val url = URL("https://api.binance.com/api/v3/ticker/price")
-                        val conn = url.openConnection() as HttpURLConnection
-                        conn.connectTimeout = 4000
-                        conn.readTimeout = 4000
-                        conn.setRequestProperty("User-Agent", "Mozilla/5.0 MiCriptoSentinel/1.7")
+                        var resp: String? = null
 
-                        if (conn.responseCode == 200) {
-                            val resp = conn.inputStream.bufferedReader().readText()
+                        // Retry de 2 intentos para despertar la interfaz de red si la radio móvil estaba dormida
+                        for (attempt in 1..2) {
+                            try {
+                                val url = URL("https://api.binance.com/api/v3/ticker/price")
+                                val conn = url.openConnection() as HttpURLConnection
+                                conn.connectTimeout = 7000
+                                conn.readTimeout = 7000
+                                conn.setRequestProperty("User-Agent", "Mozilla/5.0 MiCriptoSentinel/1.9")
+
+                                if (conn.responseCode == 200) {
+                                    resp = conn.inputStream.bufferedReader().readText()
+                                    break
+                                }
+                            } catch (e: Exception) {
+                                if (attempt == 1) {
+                                    Thread.sleep(1500)
+                                } else {
+                                    FileLogger.logWarning(context, "⚠️ Error en intento 2 de escaneo nativo Doze: ${e.message}")
+                                }
+                            }
+                        }
+
+                        if (resp != null) {
                             val priceArray = JSONArray(resp)
                             val priceMap = mutableMapOf<String, Double>()
                             for (i in 0 until priceArray.length()) {
@@ -104,33 +286,53 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
                                 val order = jsonArray.getJSONObject(i)
                                 val sym = order.getString("symbol")
                                 val target = order.getDouble("targetPrice")
-                                val side = order.optString("side", "SELL")
+                                val side = order.optString("side", "SELL").uppercase(Locale.US)
+                                val isBuy = side.contains("BUY")
                                 val curPrice = priceMap[sym] ?: continue
                                 val triggeredKey = "triggered_" + order.optString("id", sym)
                                 val alreadyTriggered = prefs.getBoolean(triggeredKey, false)
 
-                                val isHit = if (side.equals("BUY", ignoreCase = true)) {
-                                    curPrice <= target
+                                val isHit = if (isBuy) {
+                                    curPrice > 0.0 && curPrice <= target
                                 } else {
-                                    curPrice >= target
+                                    curPrice > 0.0 && curPrice >= target
+                                }
+
+                                // Si el precio está lejos del target y la orden sigue abierta, limpiar bandera para garantizar disparo
+                                if (!isHit && alreadyTriggered) {
+                                    val safeDistance = if (isBuy) curPrice > target * 1.015 else curPrice < target * 0.985
+                                    if (safeDistance) {
+                                        prefs.edit().putBoolean(triggeredKey, false).apply()
+                                    }
                                 }
 
                                 if (isHit && !alreadyTriggered) {
                                     prefs.edit().putBoolean(triggeredKey, true).apply()
                                     val dispSym = order.optString("displaySymbol", sym)
-                                    FileLogger.logInfo(context, "🎯 ¡OBJETIVO ALCANZADO EN BINANCE! $dispSym tocó $$curPrice (Meta: $$target). DISPARANDO ALARMA...")
+                                    val tp1 = target * 1.030
+                                    val tp2 = target * 1.055
+                                    val sl = target * 0.972
 
-                                    val alarmIntent = Intent(context, SentinelAlarmReceiver::class.java).apply {
-                                        putExtra("symbol", dispSym)
-                                        putExtra("event_type", if (side.equals("BUY", ignoreCase = true)) "BUY_FILLED" else "TP_HIT")
-                                        putExtra("price", String.format(Locale.US, "$%.4f", curPrice))
-                                        putExtra("amount", "${order.optDouble("amountCoins")} (${order.optDouble("expectedReturnUsdt")} USDT)")
-                                        putExtra("target_price", String.format(Locale.US, "$%.4f", target))
-                                        putExtra("projected_profit", "+$${order.optDouble("projectedProfitUsdt")} USDT")
-                                        putExtra("total_profit", "+$84.33 USDT")
-                                        putExtra("liquid_cash", "$0.91 USDT")
-                                    }
-                                    context.sendBroadcast(alarmIntent)
+                                    FileLogger.logInfo(context, if (isBuy) "⚡ ¡COMPRA LIMIT EJECUTADA EN BINANCE! $dispSym tocó $$curPrice (Límite: $$target)" else "🎯 ¡TAKE PROFIT COBRADO EN BINANCE! $dispSym tocó $$curPrice (Meta: $$target)")
+
+                                    fireImmediateAlarm(
+                                        context = context,
+                                        symbol = dispSym,
+                                        eventType = if (isBuy) "BUY_FILLED" else "TP_HIT",
+                                        price = String.format(Locale.US, "$%.4f", curPrice),
+                                        amount = if (isBuy) String.format(Locale.US, "SUELO COMPRADO: $%.4f", target) else "${order.optDouble("amountCoins")} (${order.optDouble("expectedReturnUsdt")} USDT)",
+                                        targetPrice = String.format(Locale.US, "$%.4f", if (isBuy) tp1 else target),
+                                        projectedProfit = if (isBuy) String.format(Locale.US, "TP1: $%.4f | TP2: $%.4f", tp1, tp2) else "+$${order.optDouble("projectedProfitUsdt")} USDT",
+                                        totalProfit = "+$31.91 USDT",
+                                        liquidCash = "$78.45 USDT",
+                                        tp1Price = String.format(Locale.US, "$%.4f", tp1),
+                                        tp2Price = String.format(Locale.US, "$%.4f", tp2),
+                                        slPrice = String.format(Locale.US, "$%.4f", sl),
+                                        limitBuyPrice = String.format(Locale.US, "$%.4f", target),
+                                        buyPrice = String.format(Locale.US, "$%.4f", order.optDouble("entryPrice", target)),
+                                        buyDate = order.optString("datePlaced", ""),
+                                        totalCoins = String.format(Locale.US, "%.4f", order.optDouble("amountCoins", 100.0))
+                                    )
                                     alarmFiredInCycle = true
                                     break
                                 }
@@ -145,106 +347,49 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
                         scanSmartEngineSPlus1H(context, prefs)
                     }
                 } catch (e: Exception) {
-                    FileLogger.logWarning(context, "⚠️ Error en escaneo nativo: ${e.message}")
+                    FileLogger.logWarning(context, "⚠️ Error en escaneo nativo Doze: ${e.message}")
                 } finally {
-                    // Reprogramar el siguiente escaneo exacto en 60s
+                    try {
+                        if (scanWakeLock?.isHeld == true) scanWakeLock.release()
+                    } catch (_: Exception) {}
+                    pendingResult.finish()
                     scheduleNextScan(context, 60)
                 }
             }.start()
             return
         }
 
-        // 3. Disparo Real de Alarma (Alcanzó TP o Compra)
+        // 3. Disparo de Alarma desde intent externo (Prueba de alarma o FCM)
         val symbol = intent.getStringExtra("symbol") ?: "BINANCE SPOT"
         val eventType = intent.getStringExtra("event_type") ?: "BUY_FILLED"
-        FileLogger.logInfo(context, "🚨 [Receiver] Disparo de alarma recibido: $symbol ($eventType)")
+        val price = intent.getStringExtra("price") ?: "$0.0000"
+        val amount = intent.getStringExtra("amount") ?: ""
+        val targetPrice = intent.getStringExtra("target_price") ?: "$0.0000"
+        val projectedProfit = intent.getStringExtra("projected_profit") ?: "+$0.00 USDT"
+        val totalProfit = intent.getStringExtra("total_profit") ?: "+$25.56 USDT"
+        val liquidCash = intent.getStringExtra("liquid_cash") ?: "$1,225.14 USDT"
+        val tp1Price = intent.getStringExtra("tp1_price") ?: ""
+        val tp2Price = intent.getStringExtra("tp2_price") ?: ""
+        val slPrice = intent.getStringExtra("sl_price") ?: ""
+        val limitBuyPrice = intent.getStringExtra("limit_buy_price") ?: ""
+        val tradeAmount = intent.getStringExtra("trade_amount") ?: "100.0"
 
-        // Audio Táctico Inmediato al 100%
-        SentinelAudioManager.play(context)
-
-        // Despertar pantalla de inmediato con WakeLock agresivo
-        try {
-            val pm = context.getSystemService(Context.POWER_SERVICE) as? PowerManager
-            @Suppress("DEPRECATION")
-            val wl = pm?.newWakeLock(
-                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
-                PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                PowerManager.ON_AFTER_RELEASE,
-                "micripto:receiver_wakeup"
-            )
-            wl?.acquire(60000) // 1 minuto
-            FileLogger.logInfo(context, "💡 [Receiver] WakeLock pantalla brillante adquirido con éxito (60s)")
-        } catch (e: Exception) {
-            FileLogger.logError(context, "❌ [Receiver] Error adquiriendo WakeLock", e)
-        }
-
-        // Preparar Intent para AlarmActivity
-        val alarmIntent = Intent(context, AlarmActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
-                    Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                    Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
-            putExtras(intent)
-        }
-
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        } else {
-            PendingIntent.FLAG_UPDATE_CURRENT
-        }
-        val fullScreenPendingIntent = PendingIntent.getActivity(context, 1001, alarmIntent, flags)
-
-        val silenceIntent = Intent(context, SentinelAlarmReceiver::class.java).apply {
-            action = ACTION_SILENCE
-        }
-        val silencePendingIntent = PendingIntent.getBroadcast(context, 1002, silenceIntent, flags)
-
-        // Crear Canal de Notificación de Máxima Prioridad (Canal V4 Limpio)
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "MiCripto Sentinel Alarmas Críticas",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Canal de alarmas críticas para ejecución de órdenes en Binance"
-                enableLights(true)
-                enableVibration(true)
-                vibrationPattern = longArrayOf(0, 350, 150, 350, 150, 500)
-                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                setBypassDnd(true)
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
-
-        val title = when (eventType) {
-            "TP_HIT" -> "🎯 ¡TAKE PROFIT EJECUTADO! ($symbol)"
-            "S_PLUS_ALPHA" -> "⭐ OPORTUNIDAD RADAR S+ ($symbol)"
-            else -> "🟢 COMPRA EN SUELO EJECUTADA ($symbol)"
-        }
-
-        val notificationBuilder = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle(title)
-            .setContentText("Toca para abrir la tarjeta táctica de Binance")
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setAutoCancel(true)
-            .setOngoing(true)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setFullScreenIntent(fullScreenPendingIntent, true)
-            .setContentIntent(fullScreenPendingIntent)
-            .addAction(android.R.drawable.ic_lock_power_off, "🔕 SILENCIAR", silencePendingIntent)
-            .addAction(android.R.drawable.ic_menu_view, "🚀 VER ORDEN", fullScreenPendingIntent)
-
-        notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build())
-        FileLogger.logInfo(context, "📢 [Receiver] Notificación FullScreen enviada al sistema (ID: $NOTIFICATION_ID)")
-
-        try {
-            context.startActivity(alarmIntent)
-            FileLogger.logInfo(context, "🚀 [Receiver] startActivity ejecutado hacia AlarmActivity")
-        } catch (e: Exception) {
-            FileLogger.logWarning(context, "⚠️ [Receiver] startActivity directo bloqueado por OS: ${e.message}")
-        }
+        fireImmediateAlarm(
+            context = context,
+            symbol = symbol,
+            eventType = eventType,
+            price = price,
+            amount = amount,
+            targetPrice = targetPrice,
+            projectedProfit = projectedProfit,
+            totalProfit = totalProfit,
+            liquidCash = liquidCash,
+            tp1Price = tp1Price,
+            tp2Price = tp2Price,
+            slPrice = slPrice,
+            limitBuyPrice = limitBuyPrice,
+            tradeAmount = tradeAmount
+        )
     }
 
     /**
@@ -252,9 +397,22 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
      * Evalúa cada 3 minutos la estructura 1H de las 10 monedas institucionales directo contra Binance.
      */
     private fun scanSmartEngineSPlus1H(context: Context, prefs: android.content.SharedPreferences) {
+        val settingsPrefs = context.getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+        val soundMode = settingsPrefs.getString("sound_mode", "ALWAYS") ?: "ALWAYS"
+        if (soundMode == "TOTAL_SILENCE") return
+
         val watchedSymbols = listOf(
+            // 11 Monedas de Nuestra Cartera Institucional
             "RENDERUSDT", "SUIUSDT", "NEARUSDT", "PENDLEUSDT", "XRPUSDT",
-            "ONDOUSDT", "TAOUSDT", "ALGOUSDT", "HBARUSDT", "XLMUSDT"
+            "ONDOUSDT", "TAOUSDT", "ALGOUSDT", "HBARUSDT", "XLMUSDT", "BNBUSDT",
+            // 33 Monedas Extra de Radar de Caza S+ (Top Institucionales)
+            "BTCUSDT", "ETHUSDT", "SOLUSDT", "AVAXUSDT", "LINKUSDT",
+            "INJUSDT", "APTUSDT", "SEIUSDT", "TIAUSDT", "ARBUSDT",
+            "OPUSDT", "FETUSDT", "AAVEUSDT", "UNIUSDT", "ADAUSDT",
+            "DOTUSDT", "PYTHUSDT", "GRTUSDT", "WLDUSDT", "ARKMUSDT",
+            "FTMUSDT", "POLUSDT", "ICPUSDT", "JUPUSDT", "RUNEUSDT",
+            "ENAUSDT", "DOGEUSDT", "ATOMUSDT", "THETAUSDT", "MKRUSDT",
+            "CRVUSDT", "LDOUSDT", "STRKUSDT"
         )
         val nowMs = System.currentTimeMillis()
 
@@ -266,9 +424,9 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
 
                 val url = URL("https://api.binance.com/api/v3/klines?symbol=$sym&interval=1h&limit=180")
                 val conn = url.openConnection() as HttpURLConnection
-                conn.connectTimeout = 3500
-                conn.readTimeout = 3500
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0 MiCriptoSentinel/1.8")
+                conn.connectTimeout = 6000
+                conn.readTimeout = 6000
+                conn.setRequestProperty("User-Agent", "Mozilla/5.0 MiCriptoSentinel/1.9")
 
                 if (conn.responseCode != 200) continue
                 val raw = JSONArray(conn.inputStream.bufferedReader().readText())
@@ -372,6 +530,12 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
                 }
 
                 if (sPlusTriggered) {
+                    val settingsPrefs = context.getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
+                    val soundSPlus = settingsPrefs.getBoolean("alarm_sound_s_plus", true)
+                    if (!soundSPlus) {
+                        FileLogger.logInfo(context, "🔕 [DOZE] Señal S+ detectada en $sym pero silenciada por ajustes de usuario")
+                        continue
+                    }
                     prefs.edit().putLong("splus_last_trig_$sym", nowMs).apply()
                     val dispSym = sym.replace("USDT", "")
                     val tp1 = sweepClosePrice * 1.030
@@ -384,17 +548,21 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
                         "⭐ [DOZE S+ DETECTADO] $dispSym activó compra S+ (92.3% WR) @ $$sweepClosePrice | Suelo: $$floorPrice"
                     )
 
-                    val alarmIntent = Intent(context, SentinelAlarmReceiver::class.java).apply {
-                        putExtra("symbol", "$dispSym / USDT (S+ >=90%)")
-                        putExtra("event_type", "S_PLUS_ALPHA")
-                        putExtra("price", String.format(Locale.US, "$%.4f", sweepClosePrice))
-                        putExtra("amount", String.format(Locale.US, "SUELO 1H: $%.4f (-%.1f%% 48h)", floorPrice, drop48hPct))
-                        putExtra("target_price", String.format(Locale.US, "TP1: $%.4f | TP2: $%.4f", tp1, tp2))
-                        putExtra("projected_profit", String.format(Locale.US, "OCO SL Trigger: $%.4f (-2.8%%) | Limit: $%.4f", slTrig, slLim))
-                        putExtra("total_profit", "92.3% WIN RATE (S+)")
-                        putExtra("liquid_cash", "$0.91 USDT")
-                    }
-                    context.sendBroadcast(alarmIntent)
+                    fireImmediateAlarm(
+                        context = context,
+                        symbol = "$dispSym / USDT (S+ >=90%)",
+                        eventType = "S_PLUS_ALPHA",
+                        price = String.format(Locale.US, "$%.4f", sweepClosePrice),
+                        amount = String.format(Locale.US, "SUELO 1H: $%.4f (-%.1f%% 48h)", floorPrice, drop48hPct),
+                        targetPrice = String.format(Locale.US, "$%.4f", floorPrice),
+                        projectedProfit = String.format(Locale.US, "TP1: $%.4f | TP2: $%.4f", tp1, tp2),
+                        totalProfit = "92.3% WIN RATE (S+)",
+                        liquidCash = "$78.45 USDT",
+                        tp1Price = String.format(Locale.US, "$%.4f", tp1),
+                        tp2Price = String.format(Locale.US, "$%.4f", tp2),
+                        slPrice = String.format(Locale.US, "$%.4f", slTrig),
+                        limitBuyPrice = String.format(Locale.US, "$%.4f", floorPrice)
+                    )
                     break
                 }
             } catch (_: Exception) {

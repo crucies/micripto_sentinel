@@ -1,5 +1,52 @@
 # 📜 Bitácora de Versiones — MiCripto Sentinel
 
+## [V.0.2.19] - 2026-11-07
+### Sincronización Automática con 1 Toque (GitHub Raw Directo), Cero Vercel/Web Intermedia y Conciliación Oficial de 14 Órdenes Binance Spot ($458.59 USDT Líquidos)
+
+- **Mandatos de Richard:**
+  1. *"mate... podrias enviar datos para actualizar nuestra app movil ?... yo te pasaria por aca todas las ordenes y el estado de nuestro portafolio... ahora mismo meti algunas ordenes pero un dato malo y nuestros datos no serian los correctos"*
+  2. *"Alguna otra opcion para sincronizar... sin usar micripto-lts ?... esa app ya no esta actualizada con nuestra posicion en binance..."*
+  3. *"Correcto... creo que la 1... necesitas que te provea algun credencial ?"*
+- **Soluciones Implementadas:**
+  1. **Motor de Sincronización Nube Oficial Vía GitHub Raw (100% Autónomo y Seguro):**
+     - Se desacopló definitivamente de `micripto-lts.vercel.app`.
+     - Ahora el botón **`Sinc Nube`** en el Dashboard consulta directamente el archivo autoritativo en tu repositorio: `https://raw.githubusercontent.com/crucies/micripto_sentinel/master/assets/data/sentinel_sync.json`.
+     - Con 1 solo toque en la app, descarga la configuración completa de órdenes, actualiza el saldo USDT disponible y re-escanea Binance sin reinstalar la APK.
+  2. **Conciliación Oficial de Órdenes Vivas (14 Órdenes en Binance Spot):**
+     - **1 Compra Límite Activa:** `PENDLE / USDT` @ $1.6310 (61.30 PENDLE = $99.98 USDT).
+     - **13 Ventas Límite Activas:** APT ($0.7360), ALGO ($0.1165), XLM ($0.1840), ADA TP2 ($0.2278), ADA TP1 ($0.2224), AAVE TP2 ($156.14), AAVE TP1 ($152.44), JUP TP2 ($0.3331), JUP TP1 ($0.3252), TIA TP2 ($0.6450), TIA TP1 ($0.6200), OP TP2 ($0.1352), SUI TP2 ($1.0650).
+     - **Saldo Libre en Bóveda:** Certificado en **$458.59 USDT**.
+- **Despliegue de APK:**
+  - Archivo generado: [`micripto_sentinel_v0.2.19_SincronizacionGitHubRawY14Ordenes.apk`](file:///C:/Richard/A/Aplicaciones%20Moviles/APKs/micripto_sentinel_v0.2.19_SincronizacionGitHubRawY14Ordenes.apk)
+  - Ubicación central: `C:\Richard\A\Aplicaciones Moviles\APKs`
+  - Tamaño: 50.4 MB (52,847,602 bytes).
+
+## [V.0.2.18] - 2026-11-05
+### Conciliación Integral de Bóveda Spot Binance ($458.59 USDT Líquidos), Ejecución y Archivado de INJ (+$415.11 USDT), Sincronización de 13 Órdenes Vivas y Rutina de Análisis Automático Cada 3 Horas
+
+- **Mandatos de Richard:**
+  1. *"Preferiria con la propia app movil..."*
+  2. *"Actualiza nuestro portafolio y ordenes..."*
+  3. *"Me gustaria el usdt disponible en el movil se actualize... hasta ahora no se actualiza correctamente... en la app dice que tenemos disponible... 415.89 (Controla la actualizacion al archivar la alarma o cuando se crea manualmente alguna orden)"*
+  4. *"En el analisis programado... analiza tambien nuestras criptos que hemos decidido holdear... si alguna noticia nos puede dar la idea de aumentar nuestra posicion o si aparecen nuevas gemas"*
+- **Diagnóstico y Conciliación:**
+  - **Ejecución Exitosa de INJ:** Injective alcanzó $8.4800, cumpliendo tanto TP1 ($8.1920) como TP2 ($8.3200). Se liberaron los $415.11 USDT correspondientes a la bóveda libre.
+  - **Conciliación de Bóveda Spot:** Saldo libre real de USDT en Binance certificado en **$458.59 USDT**.
+  - **Corrección de Dinámica de Saldo:** Actualizado el balance base en SentinelAutoScanner y garantizado el flujo de acreditación automática al archivar ventas ejecutadas o al registrar/cancelar compras manuales.
+  - **Sincronización de Órdenes Vivas (13 Órdenes Oficiales):**
+    - Retiradas las 2 órdenes de INJ (archivadas en el historial con éxito).
+    - Agregada la orden activa de APT/USDT (57.11 APT @ $0.7360 = $42.03 USDT).
+    - 13 órdenes límite vivas activas en Binance Spot con un retorno en espera de **$1,425.25 USDT**.
+- **Auditoría de Activos en Hold Estratégico:**
+  - **XRP (387.38):** En $1.3200, en pleno punto de equilibrio (0.0% PnL) acumulando en soporte.
+  - **ONDO (1,352.24):** $0.4026 (-9.7% PnL) blindando soporte RWA.
+  - **NEAR, PENDLE, RENDER, TAO, HBAR:** En rangos de descuento institucional, ideales para compras escalonadas tras el NFP.
+
+- **Despliegue de APK:**
+  - Archivo generado: [`micripto_sentinel_v0.2.18_ConciliacionSpot458UsdtY13Ordenes.apk`](file:///C:/Richard/A/Aplicaciones%20Moviles/APKs/micripto_sentinel_v0.2.18_ConciliacionSpot458UsdtY13Ordenes.apk)
+  - Ubicación central: `C:\Richard\A\Aplicaciones Moviles\APKs`
+  - Tamaño: 50.4 MB (52,846,156 bytes).
+
 ## [V.0.1.8] - 2026-10-20
 ### Paridad Matemática 100% Web-Móvil (`smcEngine.ts` = `SmcSPlusScanner`), Saldo Libre Spot Dinámico (`$0.91 USDT`) y Edición Táctil
 - **Diagnóstico de Richard:**
