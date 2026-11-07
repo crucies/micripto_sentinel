@@ -168,23 +168,9 @@ class OrderEntity {
     };
   }
 
-  // Lista oficial de órdenes vivas en Binance Spot (17 Órdenes Activas de Compra y Venta)
+  // Lista oficial de órdenes vivas en Binance Spot (18 Órdenes Activas: 1 Compra + 17 Ventas)
   static const List<OrderEntity> currentLiveOrders = [
-    // 🎯 COMPRAS LÍMITE ACTIVAS EN SUELO (2 Órdenes)
-    OrderEntity(
-      id: 'binance-pendle-buy-16310',
-      symbol: 'PENDLEUSDT',
-      displaySymbol: 'PENDLE (Compra Límite)',
-      side: 'Limit Buy',
-      targetPrice: 1.6310,
-      entryPrice: 1.6310,
-      amountCoins: 61.30,
-      expectedReturnUsdt: 99.9803,
-      projectedProfitUsdt: 4.25,
-      datePlaced: '2026-11-07 06:06:47 BOT',
-      status: '0% Filled (Esperando Suelo @ \$1.6310)',
-      notes: 'Limit Buy en suelo @ \$1.6310 (61.30 PENDLE = \$99.98 USDT)',
-    ),
+    // 🎯 COMPRAS LÍMITE ACTIVAS EN SUELO (1 Orden)
     OrderEntity(
       id: 'binance-link-buy-10550',
       symbol: 'LINKUSDT',
@@ -198,6 +184,37 @@ class OrderEntity {
       datePlaced: '2026-11-07 06:27:48 BOT',
       status: '0% Filled (Esperando Suelo @ \$10.550)',
       notes: 'Limit Buy en retroceso clave @ \$10.550 (9.47 LINK = \$99.91 USDT)',
+    ),
+
+    // 🎯 VENTAS / TAKE PROFIT ACTIVAS (17 Órdenes Vivas Sincronizadas)
+    // PENDLE
+    OrderEntity(
+      id: 'binance-pendle-sell-tp1-16800',
+      symbol: 'PENDLEUSDT',
+      displaySymbol: 'PENDLE (TP1)',
+      side: 'Limit Sell',
+      targetPrice: 1.6800,
+      entryPrice: 1.6310,
+      amountCoins: 30.65,
+      expectedReturnUsdt: 51.4920,
+      projectedProfitUsdt: 1.5018,
+      datePlaced: '2026-11-07 07:30:00 BOT',
+      status: '0% Filled (Esperando TP1)',
+      notes: 'Limit Sell defensivo TP1 @ \$1.6800 (+3.0%) (30.65 PENDLE = \$51.49 USDT)',
+    ),
+    OrderEntity(
+      id: 'binance-pendle-sell-tp2-17210',
+      symbol: 'PENDLEUSDT',
+      displaySymbol: 'PENDLE (TP2)',
+      side: 'Limit Sell',
+      targetPrice: 1.7210,
+      entryPrice: 1.6310,
+      amountCoins: 30.65,
+      expectedReturnUsdt: 52.7486,
+      projectedProfitUsdt: 2.7585,
+      datePlaced: '2026-11-07 07:30:00 BOT',
+      status: '0% Filled (Esperando TP2)',
+      notes: 'Limit Sell expansivo TP2 @ \$1.7210 (+5.5%) (30.65 PENDLE = \$52.75 USDT)',
     ),
 
     // 🎯 VENTAS / TAKE PROFIT ACTIVAS (15 Órdenes Vivas Sincronizadas)
@@ -434,6 +451,23 @@ class OrderEntity {
 
   // Historial oficial de órdenes completadas / archivadas en Binance Spot
   static const List<OrderEntity> defaultArchivedOrders = [
+    // PENDLE (Compra ejecutada en suelo)
+    OrderEntity(
+      id: 'binance-pendle-buy-executed-16310',
+      symbol: 'PENDLEUSDT',
+      displaySymbol: 'PENDLE (Compra)',
+      side: 'Limit Buy',
+      targetPrice: 1.6310,
+      entryPrice: 1.6310,
+      amountCoins: 61.30,
+      expectedReturnUsdt: 99.9803,
+      projectedProfitUsdt: 0.0,
+      datePlaced: '2026-11-07 06:06:47 BOT',
+      status: 'EJECUTADA / ARCHIVADA',
+      notes: '61.30 PENDLE compradas en suelo institucional @ \$1.6310 (\$99.98 USDT invertidos)',
+      archivedAt: '2026-11-07 07:25:00 BOT',
+      archivedReason: 'Compra Ejecutada en Binance Spot @ \$1.6310',
+    ),
     // INJ (TP1 y TP2 completados)
     OrderEntity(
       id: 'binance-inj-sell-tp2-8320',

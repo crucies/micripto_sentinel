@@ -1,32 +1,18 @@
 {
-  "updatedAt": "2026-11-07 07:30:00 BOT",
-  "liquidCashUsdt": 458.59,
+  "updatedAt": "2026-11-07 07:35:00 BOT",
+  "liquidCashUsdt": 358.61,
   "remoteAlert": {
-    "id": "kai-briefing-20261107-0730",
+    "id": "kai-briefing-20261107-0735",
     "hasAlert": true,
-    "timestamp": "07/11/26 • 07:30 BOT",
+    "timestamp": "07/11/26 • 07:35 BOT",
     "title": "INFORME TÁCTICO KAI (3H)",
-    "hero": "PORTAFOLIO • 17 ÓRDENES ACTIVAS",
-    "status": "VIGILANCIA ACTIVA BINANCE SPOT",
-    "summary": "BTC en $76K consolidando fuerte. PENDLE a solo 0.24% de ejecución ($1.635 vs límite $1.631). NEAR comprado a $3.69 con TPs listos ($3.801 / $3.893). LINK esperando en suelo @ $10.55.",
-    "action": "Mantener las 17 órdenes sin tocar. Saldo libre $458.59 USDT listo para absorber oportunidades.",
+    "hero": "PORTAFOLIO • 18 ÓRDENES ACTIVAS",
+    "status": "COMPRA PENDLE EJECUTADA @ $1.6310",
+    "summary": "PENDLE comprado en suelo institucional @ $1.6310. Take Profits colocados en $1.6800 (+3.0%) y $1.7210 (+5.5%). NEAR con TPs en $3.8010 y $3.8930. LINK esperando compra en suelo @ $10.550. Total 18 órdenes vivas en Binance Spot.",
+    "action": "18 órdenes vivas activas en Spot. Saldo libre: $358.61 USDT listo en bóveda.",
     "priority": "HIGH"
   },
   "orders": [
-    {
-      "id": "binance-pendle-buy-16310",
-      "symbol": "PENDLEUSDT",
-      "displaySymbol": "PENDLE (Compra Límite)",
-      "side": "Limit Buy",
-      "targetPrice": 1.6310,
-      "entryPrice": 1.6310,
-      "amountCoins": 61.30,
-      "expectedReturnUsdt": 99.9803,
-      "projectedProfitUsdt": 4.2500,
-      "datePlaced": "2026-11-07 06:06:47 BOT",
-      "status": "0% Filled (Esperando Suelo @ $1.6310)",
-      "notes": "Limit Buy en suelo @ $1.6310 (61.30 PENDLE = $99.98 USDT)"
-    },
     {
       "id": "binance-link-buy-10550",
       "symbol": "LINKUSDT",
@@ -40,6 +26,34 @@
       "datePlaced": "2026-11-07 06:27:48 BOT",
       "status": "0% Filled (Esperando Suelo @ $10.550)",
       "notes": "Limit Buy en retroceso clave @ $10.550 (9.47 LINK = $99.91 USDT)"
+    },
+    {
+      "id": "binance-pendle-sell-tp1-16800",
+      "symbol": "PENDLEUSDT",
+      "displaySymbol": "PENDLE (TP1)",
+      "side": "Limit Sell",
+      "targetPrice": 1.6800,
+      "entryPrice": 1.6310,
+      "amountCoins": 30.65,
+      "expectedReturnUsdt": 51.4920,
+      "projectedProfitUsdt": 1.5018,
+      "datePlaced": "2026-11-07 07:30:00 BOT",
+      "status": "0% Filled (Esperando TP1)",
+      "notes": "Limit Sell defensivo TP1 @ $1.6800 (+3.0%) (30.65 PENDLE = $51.49 USDT)"
+    },
+    {
+      "id": "binance-pendle-sell-tp2-17210",
+      "symbol": "PENDLEUSDT",
+      "displaySymbol": "PENDLE (TP2)",
+      "side": "Limit Sell",
+      "targetPrice": 1.7210,
+      "entryPrice": 1.6310,
+      "amountCoins": 30.65,
+      "expectedReturnUsdt": 52.7486,
+      "projectedProfitUsdt": 2.7585,
+      "datePlaced": "2026-11-07 07:30:00 BOT",
+      "status": "0% Filled (Esperando TP2)",
+      "notes": "Limit Sell expansivo TP2 @ $1.7210 (+5.5%) (30.65 PENDLE = $52.75 USDT)"
     },
     {
       "id": "binance-near-sell-tp1-38010",
