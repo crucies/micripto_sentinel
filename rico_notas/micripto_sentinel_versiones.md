@@ -1,6 +1,22 @@
 # 📜 Bitácora de Versiones — MiCripto Sentinel
 
-## [V.0.2.20] - 2026-11-07
+## [V.0.2.20] (Build 32) - 2026-11-11
+### Sincronización Estricta de Versión V.0.2.20 en UI, Corrección de Saldo Libre Spot ($158.70 USDT), Tipado Nativo y Despertar de Pantalla con onNewIntent
+
+- **Mandatos de Richard:**
+  1. *"la version de la app en la pantalla principal sigue siendo la 0.2.17"*
+  2. *"la tarjeta saldo libre muestra 458.59... aunque lo sincronize y cambie a 158... cierro y abro y muestra el mismo valor...."*
+  3. *"Cuando tenia la aplicacion abierta me saltaron don alertas de compra para link y near... parece que ya no despierta el telefono del bloqueo y tuve que abrir la app ?"*
+- **Ajustes Realizados:**
+  1. **Versión en UI:** Centralizada en `AppConstants.appVersion = 'V.0.2.20'`, eliminando cadenas quemadas de `0.2.17` en `dashboard_page.dart` (líneas 565 y 915), `settings_page.dart` y vistas nativas.
+  2. **Saldo Libre Spot Reseteado a $458.59:**
+     - En `SentinelForegroundService.kt` se guardaba como `Float`, mientras `MainActivity.kt` leía `String`, generando una excepción que hacía fallar la recuperación.
+     - En `SentinelAutoScanner.dart` se añadió `notifyListeners()` tras cargar el saldo persistido y se fijó el arranque por defecto en **$158.70 USDT**.
+     - Se activó la sincronización automática en la apertura de la app (`syncOrdersFromCloud`).
+  3. **Alertas Falsas de Compra:** La orden de compra de `LINK` ($10.550) ya estaba ejecutada en Binance Spot; al permanecer en vivas, disparaba alarma al abrir la app. Se archivó a `defaultArchivedOrders`. En vivas quedan las **17 órdenes oficiales de Take Profit (Limit Sell)**.
+  4. **Despertar en Bloqueo:** Implementado `onNewIntent` en `AlarmActivity.kt` para reactivar pantalla y adquirir WakeLock aun cuando la actividad ya existía pausada en segundo plano.
+
+## [V.0.2.20] (Build 31) - 2026-11-07
 ### Despertar Militar con Modal Táctico Remoto de Kai (3H), Conciliación Exacta de 17 Órdenes Spot (2 Compras + 15 Ventas TP) y Sincronización Automática en Segundo Plano 24/7
 
 - **Mandatos de Richard:**

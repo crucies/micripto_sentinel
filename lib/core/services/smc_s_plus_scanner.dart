@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:http/http.dart' as http;
+import '../constants/app_constants.dart';
 import 'package:intl/intl.dart';
 import 'native_alarm_service.dart';
 import 'sentinel_auto_scanner.dart';
@@ -351,7 +352,7 @@ class SmcSPlusScanner extends ChangeNotifier {
                 tp2Price: '\$${_fmt(item.tp2Price)}',
                 slPrice: '\$${_fmt(item.slTriggerPrice)}',
                 limitBuyPrice: '\$${_fmt(limitBuyVal)}',
-                appVersion: 'V 0.2.17',
+                appVersion: AppConstants.appVersionBadge,
               );
             }
           }

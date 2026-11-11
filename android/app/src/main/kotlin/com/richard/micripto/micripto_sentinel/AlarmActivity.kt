@@ -77,7 +77,7 @@ class AlarmActivity : AppCompatActivity() {
         val buyDateExtra = intent.getStringExtra("buy_date") ?: ""
         val sellDateExtra = intent.getStringExtra("sell_date") ?: ""
         val elapsedTimeExtra = intent.getStringExtra("elapsed_time") ?: ""
-        val appVersionExtra = intent.getStringExtra("app_version") ?: "V 0.2.17"
+        val appVersionExtra = intent.getStringExtra("app_version") ?: "V 0.2.20"
         val totalCoinsExtra = intent.getStringExtra("total_coins") ?: ""
 
         var tp1Str = intent.getStringExtra("tp1_price") ?: ""
@@ -421,6 +421,27 @@ class AlarmActivity : AppCompatActivity() {
             }
         } catch (_: Exception) {}
         return "2d 4h 15m"
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+            val km = getSystemService(Context.KEYGUARD_SERVICE) as? android.app.KeyguardManager
+            km?.requestDismissKeyguard(this, null)
+        }
+        try {
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            @Suppress("DEPRECATION")
+            wakeLock = powerManager.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP,
+                "micripto:AlarmActivityWakeLock"
+            )
+            wakeLock?.acquire(3 * 60 * 1000L)
+        } catch (_: Exception) {}
+        recreate()
     }
 
     override fun onDestroy() {

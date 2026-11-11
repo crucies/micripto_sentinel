@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/native_alarm_service.dart';
 import '../../../../core/services/sentinel_auto_scanner.dart';
 import '../../../orders/domain/order_entity.dart';
@@ -380,7 +381,7 @@ class _DashboardPageState extends State<DashboardPage> {
     String buyDate = '',
     String sellDate = '',
     String elapsedTime = '',
-    String appVersion = 'V 0.2.17',
+    String appVersion = AppConstants.appVersionBadge,
     String totalCoins = '',
   }) {
     NativeAlarmService.triggerImmediateAlarm(
@@ -422,7 +423,7 @@ class _DashboardPageState extends State<DashboardPage> {
     String buyDate = '',
     String sellDate = '',
     String elapsedTime = '',
-    String appVersion = 'V 0.2.17',
+    String appVersion = AppConstants.appVersionBadge,
     String totalCoins = '',
   }) {
     setState(() {
@@ -562,7 +563,7 @@ class _DashboardPageState extends State<DashboardPage> {
                           borderWidth: 2.0,
                         ),
                         child: const Text(
-                          'V.0.2.17',
+                          AppConstants.appVersion,
                           style: TextStyle(
                             fontFamily: 'monospace',
                             fontWeight: FontWeight.w900,
@@ -911,7 +912,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'MiCripto Sentinel V.0.2.17 • Terminal Centinela & Radar S+',
+                    'MiCripto Sentinel ${AppConstants.appVersion} • Terminal Centinela & Radar S+',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontFamily: 'monospace',

@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import '../../features/orders/domain/order_entity.dart';
+import '../constants/app_constants.dart';
 import 'native_alarm_service.dart';
 import 'smc_s_plus_scanner.dart';
 
@@ -38,7 +39,7 @@ class SentinelAutoScanner extends ChangeNotifier {
   bool _isScanning = false;
   String _lastScanTime = '--:--:--';
   String _statusMessage = '🟢 CENTINELA 100% AUTÓNOMO: Auto-scan Binance cada 25s';
-  double _liquidCashUsdt = 458.59;
+  double _liquidCashUsdt = 158.70;
   Map<String, dynamic>? _remoteAlert;
 
   Timer? _foregroundScanTimer;
@@ -142,6 +143,7 @@ class SentinelAutoScanner extends ChangeNotifier {
     final savedCash = await NativeAlarmService.getDoubleSetting('liquid_cash_usdt', defaultValue: -1.0);
     if (savedCash > 0) {
       _liquidCashUsdt = savedCash;
+      notifyListeners();
     }
 
     // 1. Cargar historial de órdenes archivadas persistidas
@@ -164,6 +166,9 @@ class SentinelAutoScanner extends ChangeNotifier {
 
     // 6. Activar Centinela Nativo de Fondo en Android (Despierta con AlarmClock en Doze Mode)
     await NativeAlarmService.startNativeBackgroundScan();
+
+    // 7. Sincronizar automáticamente el estado oficial y las alertas de Kai desde GitHub
+    syncOrdersFromCloud();
   }
 
   /// Cargar órdenes archivadas de persistencia nativa
@@ -251,7 +256,7 @@ class SentinelAutoScanner extends ChangeNotifier {
         final List<dynamic> list = jsonDecode(cachedJson);
         if (list.isNotEmpty) {
           final loaded = list.map((item) => OrderEntity.fromJson(item as Map<String, dynamic>)).toList();
-          // Descartar órdenes archivadas (incluyendo INJ cobrado, TIA Compra, OP TP1, SUI TP1, ONDO)
+          // Descartar órdenes archivadas (incluyendo INJ cobrado, TIA Compra, OP TP1, SUI TP1, ONDO, LINK Compra)
           _orders = loaded.where((o) => !_archivedOrderIds.contains(o.id) &&
               o.id != 'binance-inj-sell-tp1-8192' &&
               o.id != 'binance-inj-sell-tp2-8320' &&
@@ -259,7 +264,9 @@ class SentinelAutoScanner extends ChangeNotifier {
               o.id != 'binance-ondo-sell-04620' &&
               o.id != 'binance-op-buy-01281' &&
               o.id != 'binance-op-sell-tp1-01320' &&
-              o.id != 'binance-sui-sell-10540').toList();
+              o.id != 'binance-sui-sell-10540' &&
+              o.id != 'binance-link-buy-10550' &&
+              !o.id.contains('near-buy')).toList();
           // Asegurar que todas las órdenes vivas oficiales de Binance Spot estén presentes
           for (final liveOrder in OrderEntity.currentLiveOrders) {
             if (!_orders.any((o) => o.id == liveOrder.id) && !_archivedOrderIds.contains(liveOrder.id)) {
@@ -488,7 +495,7 @@ class SentinelAutoScanner extends ChangeNotifier {
               buyDate: buyDateStr,
               sellDate: sellDateStr,
               elapsedTime: elapsedTimeStr,
-              appVersion: 'V 0.2.12',
+              appVersion: AppConstants.appVersionBadge,
               totalCoins: order.amountCoins > 0 ? order.amountCoins.toStringAsFixed(4) : '',
             );
           }

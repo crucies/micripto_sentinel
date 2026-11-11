@@ -282,7 +282,7 @@ class MainActivity : FlutterActivity() {
             putExtra("buy_date", args["buyDate"]?.toString() ?: "")
             putExtra("sell_date", args["sellDate"]?.toString() ?: "")
             putExtra("elapsed_time", args["elapsedTime"]?.toString() ?: "")
-            putExtra("app_version", args["appVersion"]?.toString() ?: "V 0.2.17")
+            putExtra("app_version", args["appVersion"]?.toString() ?: "V 0.2.20")
             putExtra("total_coins", args["totalCoins"]?.toString() ?: "")
         }
         startActivity(intent)
@@ -324,7 +324,7 @@ class MainActivity : FlutterActivity() {
             putExtra("buy_date", args["buyDate"]?.toString() ?: "")
             putExtra("sell_date", args["sellDate"]?.toString() ?: "")
             putExtra("elapsed_time", args["elapsedTime"]?.toString() ?: "")
-            putExtra("app_version", args["appVersion"]?.toString() ?: "V 0.2.17")
+            putExtra("app_version", args["appVersion"]?.toString() ?: "V 0.2.20")
             putExtra("total_coins", args["totalCoins"]?.toString() ?: "")
         }
 

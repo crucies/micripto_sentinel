@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/sentinel_auto_scanner.dart';
 import '../../../orders/domain/order_entity.dart';
 
@@ -175,7 +176,7 @@ class _ProfitReportsPageState extends State<ProfitReportsPage> {
               borderWidth: 1.5,
             ),
             child: const Text(
-              'V.0.2.14',
+              AppConstants.appVersion,
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontSize: 10,

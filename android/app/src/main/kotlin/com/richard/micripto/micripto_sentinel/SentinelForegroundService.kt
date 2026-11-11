@@ -186,7 +186,7 @@ class SentinelForegroundService : Service() {
             if (json.has("liquidCashUsdt")) {
                 val cash = json.getDouble("liquidCashUsdt")
                 val settingsPrefs = getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)
-                settingsPrefs.edit().putFloat("liquid_cash_usdt", cash.toFloat()).apply()
+                settingsPrefs.edit().putString("liquid_cash_usdt", cash.toString()).apply()
             }
 
             // 2. Verificar si hay un Informe Táctico / Alerta Remota de Kai

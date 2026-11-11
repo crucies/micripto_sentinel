@@ -180,7 +180,7 @@ class SentinelAlarmReceiver : BroadcastReceiver() {
             buyDate: String = "",
             sellDate: String = "",
             elapsedTime: String = "",
-            appVersion: String = "V 0.2.17",
+            appVersion: String = "V 0.2.20",
             totalCoins: String = ""
         ) {
             val settingsPrefs = context.getSharedPreferences("sentinel_settings", Context.MODE_PRIVATE)

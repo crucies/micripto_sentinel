@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../../../core/services/native_alarm_service.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -100,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
       buyDate: '2026-10-22 07:36:24 BOT',
       sellDate: '2026-10-22 15:00:00 BOT',
       elapsedTime: '0d 7h 24m',
-      appVersion: 'V 0.2.17',
+      appVersion: AppConstants.appVersionBadge,
       totalCoins: '0.6220',
     );
   }
@@ -1497,7 +1498,7 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             color: AppColors.ink,
             child: const Text(
-              'MiCripto Sentinel • V.0.2.17',
+              'MiCripto Sentinel • ${AppConstants.appVersion}',
               style: TextStyle(
                 fontFamily: 'monospace',
                 fontWeight: FontWeight.w900,

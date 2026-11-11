@@ -168,25 +168,38 @@ class OrderEntity {
     };
   }
 
-  // Lista oficial de órdenes vivas en Binance Spot (18 Órdenes Activas: 1 Compra + 17 Ventas)
+  // Lista oficial de órdenes vivas en Binance Spot (17 Órdenes Activas de Venta / Take Profit)
   static const List<OrderEntity> currentLiveOrders = [
-    // 🎯 COMPRAS LÍMITE ACTIVAS EN SUELO (1 Orden)
-    OrderEntity(
-      id: 'binance-link-buy-10550',
-      symbol: 'LINKUSDT',
-      displaySymbol: 'LINK (Compra Límite)',
-      side: 'Limit Buy',
-      targetPrice: 10.5500,
-      entryPrice: 10.5500,
-      amountCoins: 9.47,
-      expectedReturnUsdt: 99.9085,
-      projectedProfitUsdt: 4.5000,
-      datePlaced: '2026-11-07 06:27:48 BOT',
-      status: '0% Filled (Esperando Suelo @ \$10.550)',
-      notes: 'Limit Buy en retroceso clave @ \$10.550 (9.47 LINK = \$99.91 USDT)',
-    ),
-
     // 🎯 VENTAS / TAKE PROFIT ACTIVAS (17 Órdenes Vivas Sincronizadas)
+    // LINK
+    OrderEntity(
+      id: 'binance-link-sell-tp1-10867',
+      symbol: 'LINKUSDT',
+      displaySymbol: 'LINK (TP1)',
+      side: 'Limit Sell',
+      targetPrice: 10.8670,
+      entryPrice: 10.5500,
+      amountCoins: 4.73,
+      expectedReturnUsdt: 51.4009,
+      projectedProfitUsdt: 1.5009,
+      datePlaced: '2026-11-10 07:15:00 BOT',
+      status: '0% Filled (Esperando TP1)',
+      notes: 'Limit Sell defensivo TP1 @ \$10.867 (+3.0%) (4.73 LINK = \$51.40 USDT)',
+    ),
+    OrderEntity(
+      id: 'binance-link-sell-tp2-11130',
+      symbol: 'LINKUSDT',
+      displaySymbol: 'LINK (TP2)',
+      side: 'Limit Sell',
+      targetPrice: 11.1300,
+      entryPrice: 10.5500,
+      amountCoins: 4.74,
+      expectedReturnUsdt: 52.7562,
+      projectedProfitUsdt: 2.7492,
+      datePlaced: '2026-11-10 07:15:00 BOT',
+      status: '0% Filled (Esperando TP2)',
+      notes: 'Limit Sell expansivo TP2 @ \$11.130 (+5.5%) (4.74 LINK = \$52.76 USDT)',
+    ),
     // PENDLE
     OrderEntity(
       id: 'binance-pendle-sell-tp1-16800',
@@ -451,6 +464,23 @@ class OrderEntity {
 
   // Historial oficial de órdenes completadas / archivadas en Binance Spot
   static const List<OrderEntity> defaultArchivedOrders = [
+    // LINK (Compra ejecutada en suelo institucional)
+    OrderEntity(
+      id: 'binance-link-buy-executed-10550',
+      symbol: 'LINKUSDT',
+      displaySymbol: 'LINK (Compra)',
+      side: 'Limit Buy',
+      targetPrice: 10.5500,
+      entryPrice: 10.5500,
+      amountCoins: 9.47,
+      expectedReturnUsdt: 99.9085,
+      projectedProfitUsdt: 0.0,
+      datePlaced: '2026-11-07 06:27:48 BOT',
+      status: 'EJECUTADA / ARCHIVADA',
+      notes: '9.47 LINK compradas en suelo institucional @ \$10.550 (\$99.91 USDT invertidos)',
+      archivedAt: '2026-11-10 07:10:00 BOT',
+      archivedReason: 'Compra Ejecutada en Binance Spot @ \$10.5500',
+    ),
     // PENDLE (Compra ejecutada en suelo)
     OrderEntity(
       id: 'binance-pendle-buy-executed-16310',
