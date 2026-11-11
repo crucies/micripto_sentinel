@@ -1,16 +1,16 @@
 {
-  "updatedAt": "2026-11-10 07:15:00 BOT",
+  "updatedAt": "2026-11-11 07:52:00 BOT",
   "liquidCashUsdt": 158.70,
   "freeDeployableUsdt": 158.70,
   "remoteAlert": {
-    "id": "kai-report-3h-link-filled",
+    "id": "kai-test-live-20261111-0752",
     "hasAlert": true,
-    "timestamp": "10/11/26 • 07:15 BOT",
-    "title": "INFORME TÁCTICO KAI (3H) • ¡COMPRA LINK EJECUTADA!",
-    "hero": "LINK COMPRADO @ $10.550 • 19 TPs ACTIVOS",
-    "status": "COMPRA LINK EJECUTADA EN SUELO",
-    "summary": "BTC retrocede de forma saludable a $74.2K tras el ATH. La orden de LINK @ $10.550 (9.47 LINK = $99.91 USDT) SE EJECUTÓ con éxito (mínimo $10.412). Colocar TPs inmediatos en $10.867 y $11.130. Bóveda libre: $158.70 USDT.",
-    "action": "Colocar 2 ventas Take Profit para LINK: 4.73 LINK @ $10.867 (+3%) y 4.74 LINK @ $11.130 (+5.5%). Dejar correr PENDLE y NEAR.",
+    "timestamp": "11/11/26 • 07:52 BOT",
+    "title": "PRUEBA EN VIVO: ENLACE TÁCTICO KAI",
+    "hero": "MENSAJE DIRECTO DE KAI PARA RICHARD",
+    "status": "CANAL DE EMERGENCIA 100% OPERATIVO",
+    "summary": "¡Hola Richard, mate! Este es un mensaje directo en tiempo real hacia tu teléfono físico. Si estás viendo esta ventana y sonó la alarma, significa que nuestro motor de enlace táctico remoto 24/7 superó el bloqueo de pantalla con éxito absoluto.",
+    "action": "Presiona el botón 'SILENCIAR' abajo para apagar el sonar y confírmame por el chat que la prueba fue un éxito total.",
     "priority": "HIGH"
   },
   "orders": [
