@@ -1,8 +1,8 @@
 # 🛡️ REPORTE DE INVESTIGACIÓN ADVERSARIAL CUANTITATIVA
 **Alianza:** Richard & Kai — *Protocolo Antigravity*  
-**Sesión Operativa:** SESIÓN AMERICANA (Wall Street & ETFs)  
-**Fecha de Emisión:** 2026-11-11 05:11:00 BOT  
-**Próxima Sesión:** 22:00 BOT (Sesión Asiática)  
+**Sesión Operativa:** SESIÓN ASIÁTICA (Tokio & Hong Kong)  
+**Fecha de Emisión:** 2026-11-11 17:29:50 BOT  
+**Próxima Sesión:** 10:30 BOT (Sesión Americana / Wall Street)  
 **Motor:** Smart Money Concepts (SMC) + Red Team Adversarial Validation  
 **Universo Monitoreado:** 44 Pares Oficiales Binance Spot  
 **Capital Asignado por Disparo:** $500.00 USDT  
@@ -10,7 +10,7 @@
 
 ---
 
-## 🎯 RESUMEN EJECUTIVO DE LA SESIÓN AMERICANA (WALL STREET & ETFS)
+## 🎯 RESUMEN EJECUTIVO DE LA SESIÓN ASIÁTICA (TOKIO & HONG KONG)
 Este informe es el resultado del combate analítico entre nuestro **Alpha Scout** y el **Adversary Inquisitor**, evaluados por el **Arbiter Judge** 1 hora después de la apertura de los mercados mundiales.
 
 | Moneda | Precio Actual | Suelo 1H | Distancia Suelo | Descuento 48h | RSI 1H | Score Final | Grado | Veredicto Adversarial |
@@ -27,4 +27,4 @@ Este informe es el resultado del combate analítico entre nuestro **Alpha Scout*
 3. **Para Activos Rechazados:** Cero dólares asignados; se evita el riesgo de atrape o capital congelado.
 
 ---
-*Próxima actualización programada: 22:00 BOT (Sesión Asiática)*
+*Próxima actualización programada: 10:30 BOT (Sesión Americana / Wall Street)*
