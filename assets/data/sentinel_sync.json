@@ -1,13 +1,13 @@
 {
-  "updatedAt": "2026-11-11 07:52:00 BOT",
+  "updatedAt": "2026-11-11 08:59:00 BOT",
   "liquidCashUsdt": 158.70,
   "freeDeployableUsdt": 158.70,
   "remoteAlert": {
-    "id": "kai-test-live-20261111-0818",
+    "id": "kai-live-handshake-20261111-0859",
     "hasAlert": true,
-    "timestamp": "11/11/26 • 07:52 BOT",
-    "title": "PRUEBA EN VIVO: ENLACE TÁCTICO KAI",
-    "hero": "MENSAJE DIRECTO DE KAI PARA RICHARD",
+    "timestamp": "11/11/26 • 08:59 BOT",
+    "title": "PRUEBA DE ENLACE DIRECTO KAI • RICHARD & KAI",
+    "hero": "ENLACE TÁCTICO REMOTO ESTABLECIDO CON ÉXITO",
     "status": "CANAL DE EMERGENCIA 100% OPERATIVO",
     "summary": "¡Hola Richard, mate! Este es un mensaje directo en tiempo real hacia tu teléfono físico. Si estás viendo esta ventana y sonó la alarma, significa que nuestro motor de enlace táctico remoto 24/7 superó el bloqueo de pantalla con éxito absoluto.",
     "action": "Presiona el botón 'SILENCIAR' abajo para apagar el sonar y confírmame por el chat que la prueba fue un éxito total.",
