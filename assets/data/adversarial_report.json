@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-11-13 16:57:14",
-  "sessionName": "SESI\u00d3N ASI\u00c1TICA (Tokio & Hong Kong)",
-  "sessionCode": "ASIA_SESSION",
-  "nextSession": "10:30 BOT (Sesi\u00f3n Americana / Wall Street)",
+  "updatedAt": "2026-11-14 04:51:39",
+  "sessionName": "SESI\u00d3N AMERICANA (Wall Street & ETFs)",
+  "sessionCode": "NY_SESSION",
+  "nextSession": "22:00 BOT (Sesi\u00f3n Asi\u00e1tica)",
   "approvedCount": 0,
   "totalScanned": 44,
   "candidates": []
