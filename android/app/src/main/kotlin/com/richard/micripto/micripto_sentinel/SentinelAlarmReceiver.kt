@@ -10,6 +10,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.net.Uri
+import android.media.RingtoneManager
 import android.os.Build
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
@@ -22,7 +23,7 @@ import java.util.Locale
 class SentinelAlarmReceiver : BroadcastReceiver() {
 
     companion object {
-        const val CHANNEL_ID = "sentinel_emergency_v4"
+        const val CHANNEL_ID = "sentinel_emergency_v5"
         const val NOTIFICATION_ID = 1001
         const val ACTION_SILENCE = "com.richard.micripto.ACTION_SILENCE"
         const val ACTION_SENTINEL_SCAN = "com.richard.micripto.ACTION_SENTINEL_SCAN"

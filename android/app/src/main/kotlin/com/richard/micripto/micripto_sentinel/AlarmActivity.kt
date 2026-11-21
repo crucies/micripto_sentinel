@@ -444,6 +444,16 @@ class AlarmActivity : AppCompatActivity() {
         recreate()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+            val km = getSystemService(Context.KEYGUARD_SERVICE) as? android.app.KeyguardManager
+            km?.requestDismissKeyguard(this, null)
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         stopAlarm()
