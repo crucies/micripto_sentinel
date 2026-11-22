@@ -39,7 +39,7 @@ class SentinelAutoScanner extends ChangeNotifier {
   bool _isScanning = false;
   String _lastScanTime = '--:--:--';
   String _statusMessage = '🟢 CENTINELA 100% AUTÓNOMO: Auto-scan Binance cada 25s';
-  double _liquidCashUsdt = 105.02;
+  double _liquidCashUsdt = 0.06;
   Map<String, dynamic>? _remoteAlert;
 
   Timer? _foregroundScanTimer;
