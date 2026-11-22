@@ -1,46 +1,32 @@
 {
-  "updatedAt": "2026-11-22 05:05:00 BOT",
-  "liquidCashUsdt": 158.70,
-  "freeDeployableUsdt": 158.70,
+  "updatedAt": "2026-11-22 06:05:00 BOT",
+  "liquidCashUsdt": 105.02,
+  "freeDeployableUsdt": 105.02,
   "remoteAlert": {
-    "id": "kai-3h-brief-20261122-0505",
+    "id": "kai-sync-xrp500-16tps-20261122-0605",
     "hasAlert": true,
-    "timestamp": "22/11/26 • 05:05 BOT",
-    "title": "INFORME TACTICO 3H: REVISION PORTAFOLIO",
-    "hero": "BTC TESTEA $60K • DEFENSAS SPOT ACTIVAS",
-    "status": "BOVEDA PROTEGIDA • 17 ORDENES VIVAS",
-    "summary": "Richard, mate: BTC oscila en $59,800 buscando suelo. Nuestras 17 ordenes de venta (TPs) permanecen intactas en Binance Spot con $158.70 USDT en reserva defensiva. Cero riesgo de liquidacion. NEAR muestra leve rebote a $2.92 y RENDER fortaleza en $1.33. Mantenemos disciplina absoluta y paciencia institucional.",
-    "action": "Monitoreo continuo activo. No se requieren maniobras forzadas; dejamos que las ordenes limite operen en los libros.",
-    "priority": "MEDIUM"
+    "timestamp": "22/11/26 • 06:05 BOT",
+    "title": "CONCILIACION OFICIAL: 500 XRP & 16 ORDENES SPOT",
+    "hero": "500 XRP EN BILLETERA SPOT • 16 TPs ACTIVOS",
+    "status": "BOVEDA $105.02 USDT • $1,482.22 USDT EN TPs",
+    "summary": "Richard, mate: Compra de 112.6 XRP liquidada con exito alcanzando 499.989 XRP (~500 XRP). El saldo libre disponible en Spot es exactamente $105.02 USDT. Conciliadas las 16 ordenes oficiales vivas en Binance Spot que totalizan $1,482.22 USDT en objetivos de salida.",
+    "action": "Presiona 'Sinc Nube' para ver el saldo actualizado a $105.02 USDT y las 16 ordenes en pantalla.",
+    "priority": "HIGH"
   },
   "orders": [
     {
-      "id": "binance-link-sell-tp1-10867",
-      "symbol": "LINKUSDT",
-      "displaySymbol": "LINK (TP1)",
+      "id": "binance-pendle-sell-tp2-17210",
+      "symbol": "PENDLEUSDT",
+      "displaySymbol": "PENDLE (TP2)",
       "side": "Limit Sell",
-      "targetPrice": 10.8670,
-      "entryPrice": 10.5500,
-      "amountCoins": 4.73,
-      "expectedReturnUsdt": 51.4009,
-      "projectedProfitUsdt": 1.5009,
-      "datePlaced": "2026-11-10 07:15:00 BOT",
-      "status": "0% Filled (Esperando TP1)",
-      "notes": "Limit Sell defensivo TP1 @ $10.867 (+3.0%) (4.73 LINK = $51.40 USDT)"
-    },
-    {
-      "id": "binance-link-sell-tp2-11130",
-      "symbol": "LINKUSDT",
-      "displaySymbol": "LINK (TP2)",
-      "side": "Limit Sell",
-      "targetPrice": 11.1300,
-      "entryPrice": 10.5500,
-      "amountCoins": 4.74,
-      "expectedReturnUsdt": 52.7562,
-      "projectedProfitUsdt": 2.7492,
-      "datePlaced": "2026-11-10 07:15:00 BOT",
+      "targetPrice": 1.7210,
+      "entryPrice": 1.2900,
+      "amountCoins": 30.7,
+      "expectedReturnUsdt": 52.8347,
+      "projectedProfitUsdt": 13.2317,
+      "datePlaced": "2026-11-07 07:28:45 BOT",
       "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo TP2 @ $11.130 (+5.5%) (4.74 LINK = $52.76 USDT)"
+      "notes": "Limit Sell expansivo TP2 en Binance Spot @ $1.721 (30.7 PENDLE = $52.83 USDT)"
     },
     {
       "id": "binance-pendle-sell-tp1-16800",
@@ -48,41 +34,13 @@
       "displaySymbol": "PENDLE (TP1)",
       "side": "Limit Sell",
       "targetPrice": 1.6800,
-      "entryPrice": 1.6310,
-      "amountCoins": 30.65,
-      "expectedReturnUsdt": 51.4920,
-      "projectedProfitUsdt": 1.5018,
-      "datePlaced": "2026-11-07 07:30:00 BOT",
+      "entryPrice": 1.2900,
+      "amountCoins": 30.7,
+      "expectedReturnUsdt": 51.5760,
+      "projectedProfitUsdt": 11.9730,
+      "datePlaced": "2026-11-07 07:28:14 BOT",
       "status": "0% Filled (Esperando TP1)",
-      "notes": "Limit Sell defensivo TP1 @ $1.6800 (+3.0%) (30.65 PENDLE = $51.49 USDT)"
-    },
-    {
-      "id": "binance-pendle-sell-tp2-17210",
-      "symbol": "PENDLEUSDT",
-      "displaySymbol": "PENDLE (TP2)",
-      "side": "Limit Sell",
-      "targetPrice": 1.7210,
-      "entryPrice": 1.6310,
-      "amountCoins": 30.65,
-      "expectedReturnUsdt": 52.7486,
-      "projectedProfitUsdt": 2.7585,
-      "datePlaced": "2026-11-07 07:30:00 BOT",
-      "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo TP2 @ $1.7210 (+5.5%) (30.65 PENDLE = $52.75 USDT)"
-    },
-    {
-      "id": "binance-near-sell-tp1-38010",
-      "symbol": "NEARUSDT",
-      "displaySymbol": "NEAR (TP1)",
-      "side": "Limit Sell",
-      "targetPrice": 3.8010,
-      "entryPrice": 3.6900,
-      "amountCoins": 13.55,
-      "expectedReturnUsdt": 51.5035,
-      "projectedProfitUsdt": 1.5040,
-      "datePlaced": "2026-11-07 06:22:00 BOT",
-      "status": "0% Filled (Esperando TP1)",
-      "notes": "Limit Sell defensivo TP1 @ $3.8010 (+3.0%) (13.55 NEAR = $51.50 USDT)"
+      "notes": "Limit Sell defensivo TP1 en Binance Spot @ $1.680 (30.7 PENDLE = $51.58 USDT)"
     },
     {
       "id": "binance-near-sell-tp2-38930",
@@ -90,18 +48,18 @@
       "displaySymbol": "NEAR (TP2)",
       "side": "Limit Sell",
       "targetPrice": 3.8930,
-      "entryPrice": 3.6900,
-      "amountCoins": 13.55,
-      "expectedReturnUsdt": 52.7501,
-      "projectedProfitUsdt": 2.7506,
-      "datePlaced": "2026-11-07 06:22:00 BOT",
+      "entryPrice": 2.9400,
+      "amountCoins": 13.5,
+      "expectedReturnUsdt": 52.5555,
+      "projectedProfitUsdt": 12.8655,
+      "datePlaced": "2026-11-07 06:33:43 BOT",
       "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo TP2 @ $3.8930 (+5.5%) (13.55 NEAR = $52.75 USDT)"
+      "notes": "Limit Sell defensivo TP2 en Binance Spot @ $3.893 (13.5 NEAR = $52.56 USDT)"
     },
     {
-      "id": "binance-apt-sell-07360",
+      "id": "binance-apt-sell-tp2-07360",
       "symbol": "APTUSDT",
-      "displaySymbol": "APT",
+      "displaySymbol": "APT (TP2)",
       "side": "Limit Sell",
       "targetPrice": 0.7360,
       "entryPrice": 0.6950,
@@ -109,27 +67,27 @@
       "expectedReturnUsdt": 42.0329,
       "projectedProfitUsdt": 2.3415,
       "datePlaced": "2026-10-25 10:36:28 BOT",
-      "status": "0% Filled (Esperando Venta)",
-      "notes": "Limit Sell de toma de beneficios @ $0.7360 (57.11 APT = $42.03 USDT)"
+      "status": "0% Filled (Esperando TP2)",
+      "notes": "Limit Sell TP2 en Binance Spot @ $0.7360 (57.11 APT = $42.03 USDT)"
     },
     {
-      "id": "binance-algo-sell-01165",
+      "id": "binance-algo-sell-tp1-01165",
       "symbol": "ALGOUSDT",
-      "displaySymbol": "ALGO",
+      "displaySymbol": "ALGO (TP1)",
       "side": "Limit Sell",
       "targetPrice": 0.1165,
       "entryPrice": 0.1190,
       "amountCoins": 840.0,
       "expectedReturnUsdt": 97.8600,
-      "projectedProfitUsdt": 0.0,
+      "projectedProfitUsdt": -2.1000,
       "datePlaced": "2026-10-22 09:08:55 BOT",
-      "status": "0% Filled (Esperando Venta)",
-      "notes": "Limit Sell de rotación @ $0.1165 (840 ALGO = $97.86 USDT)"
+      "status": "0% Filled (Esperando TP1)",
+      "notes": "Limit Sell en Binance Spot @ $0.1165 (840 ALGO = $97.86 USDT)"
     },
     {
-      "id": "binance-xlm-sell-01840",
+      "id": "binance-xlm-sell-tp2-01840",
       "symbol": "XLMUSDT",
-      "displaySymbol": "XLM",
+      "displaySymbol": "XLM (TP2)",
       "side": "Limit Sell",
       "targetPrice": 0.1840,
       "entryPrice": 0.1786,
@@ -137,8 +95,8 @@
       "expectedReturnUsdt": 82.0640,
       "projectedProfitUsdt": 2.4084,
       "datePlaced": "2026-10-22 09:07:56 BOT",
-      "status": "0% Filled (Esperando Venta)",
-      "notes": "Limit Sell de rotación @ $0.1840 (446 XLM = $82.06 USDT)"
+      "status": "0% Filled (Esperando TP2)",
+      "notes": "Limit Sell TP2 en Binance Spot @ $0.1840 (446 XLM = $82.06 USDT)"
     },
     {
       "id": "binance-ada-sell-tp2-02278",
@@ -152,7 +110,7 @@
       "projectedProfitUsdt": 5.7195,
       "datePlaced": "2026-10-22 08:11:13 BOT",
       "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo TP2 @ $0.2278 (508.4 ADA = $115.81 USDT)"
+      "notes": "Limit Sell expansivo TP2 en Binance Spot @ $0.2278 (508.4 ADA = $115.81 USDT)"
     },
     {
       "id": "binance-ada-sell-tp1-02224",
@@ -166,7 +124,7 @@
       "projectedProfitUsdt": 2.4324,
       "datePlaced": "2026-10-22 08:10:58 BOT",
       "status": "0% Filled (Esperando TP1)",
-      "notes": "Limit Sell defensivo TP1 @ $0.2224 (415.8 ADA = $92.47 USDT)"
+      "notes": "Limit Sell defensivo TP1 en Binance Spot @ $0.2224 (415.8 ADA = $92.47 USDT)"
     },
     {
       "id": "binance-aave-sell-tp2-15614",
@@ -177,10 +135,10 @@
       "entryPrice": 147.67,
       "amountCoins": 0.731,
       "expectedReturnUsdt": 114.1383,
-      "projectedProfitUsdt": 6.1916,
+      "projectedProfitUsdt": 6.1915,
       "datePlaced": "2026-10-22 07:37:57 BOT",
       "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo TP2 @ $156.14 (0.731 AAVE = $114.14 USDT)"
+      "notes": "Limit Sell expansivo TP2 en Binance Spot @ $156.14 (0.731 AAVE = $114.14 USDT)"
     },
     {
       "id": "binance-aave-sell-tp1-15244",
@@ -190,11 +148,11 @@
       "targetPrice": 152.44,
       "entryPrice": 147.67,
       "amountCoins": 0.622,
-      "expectedReturnUsdt": 94.8177,
-      "projectedProfitUsdt": 2.9669,
+      "expectedReturnUsdt": 94.8176,
+      "projectedProfitUsdt": 2.9668,
       "datePlaced": "2026-10-22 07:36:24 BOT",
       "status": "0% Filled (Esperando TP1)",
-      "notes": "Limit Sell defensivo TP1 @ $152.44 (0.622 AAVE = $94.82 USDT)"
+      "notes": "Limit Sell defensivo TP1 en Binance Spot @ $152.44 (0.622 AAVE = $94.82 USDT)"
     },
     {
       "id": "binance-jup-sell-tp2-03331",
@@ -202,13 +160,13 @@
       "displaySymbol": "JUP (TP2)",
       "side": "Limit Sell",
       "targetPrice": 0.3331,
-      "entryPrice": 0.314115,
+      "entryPrice": 0.3141,
       "amountCoins": 505.0,
       "expectedReturnUsdt": 168.2155,
-      "projectedProfitUsdt": 9.5874,
+      "projectedProfitUsdt": 9.5950,
       "datePlaced": "2026-10-22 07:21:36 BOT",
       "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo TP2 @ $0.3331 (505 JUP = $168.22 USDT)"
+      "notes": "Limit Sell expansivo TP2 en Binance Spot @ $0.3331 (505 JUP = $168.22 USDT)"
     },
     {
       "id": "binance-jup-sell-tp1-03252",
@@ -216,13 +174,13 @@
       "displaySymbol": "JUP (TP1)",
       "side": "Limit Sell",
       "targetPrice": 0.3252,
-      "entryPrice": 0.314115,
+      "entryPrice": 0.3141,
       "amountCoins": 450.0,
       "expectedReturnUsdt": 146.3400,
-      "projectedProfitUsdt": 4.9883,
+      "projectedProfitUsdt": 4.9950,
       "datePlaced": "2026-10-22 07:21:04 BOT",
       "status": "0% Filled (Esperando TP1)",
-      "notes": "Limit Sell defensivo TP1 @ $0.3252 (450 JUP = $146.34 USDT)"
+      "notes": "Limit Sell defensivo TP1 en Binance Spot @ $0.3252 (450 JUP = $146.34 USDT)"
     },
     {
       "id": "binance-tia-sell-tp2-06450",
@@ -236,7 +194,7 @@
       "projectedProfitUsdt": 9.0077,
       "datePlaced": "2026-10-22 07:06:51 BOT",
       "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo TP2 @ $0.6450 (169 TIA = $109.01 USDT)"
+      "notes": "Limit Sell expansivo TP2 en Binance Spot @ $0.6450 (169 TIA = $109.01 USDT)"
     },
     {
       "id": "binance-tia-sell-tp1-06200",
@@ -250,7 +208,7 @@
       "projectedProfitUsdt": 4.7827,
       "datePlaced": "2026-10-22 07:05:51 BOT",
       "status": "0% Filled (Esperando TP1)",
-      "notes": "Limit Sell defensivo TP1 @ $0.6200 (169 TIA = $104.78 USDT)"
+      "notes": "Limit Sell defensivo TP1 en Binance Spot @ $0.6200 (169 TIA = $104.78 USDT)"
     },
     {
       "id": "binance-op-sell-tp2-01352",
@@ -264,21 +222,21 @@
       "projectedProfitUsdt": 5.1622,
       "datePlaced": "2026-10-21 10:47:48 BOT",
       "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo @ $0.1352 (727.08 OP = $98.30 USDT)"
+      "notes": "Limit Sell expansivo TP2 en Binance Spot @ $0.1352 (727.08 OP = $98.30 USDT)"
     },
     {
-      "id": "binance-sui-sell-10650",
+      "id": "binance-sui-sell-tp2-10650",
       "symbol": "SUIUSDT",
       "displaySymbol": "SUI (TP2)",
       "side": "Limit Sell",
       "targetPrice": 1.0650,
-      "entryPrice": 1.0020,
+      "entryPrice": 1.0300,
       "amountCoins": 149.7,
-      "expectedReturnUsdt": 159.4304,
-      "projectedProfitUsdt": 9.4311,
+      "expectedReturnUsdt": 159.4305,
+      "projectedProfitUsdt": 5.2395,
       "datePlaced": "2026-10-17 09:18:42 BOT",
       "status": "0% Filled (Esperando TP2)",
-      "notes": "Limit Sell expansivo TP2 @ $1.0650 (149.7 SUI = $159.43 USDT)"
+      "notes": "Limit Sell expansivo TP2 en Binance Spot @ $1.0650 (149.7 SUI = $159.43 USDT)"
     }
   ]
 }
