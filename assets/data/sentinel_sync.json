@@ -1,17 +1,17 @@
 {
-  "updatedAt": "2026-11-11 09:07:00 BOT",
+  "updatedAt": "2026-11-22 05:05:00 BOT",
   "liquidCashUsdt": 158.70,
   "freeDeployableUsdt": 158.70,
   "remoteAlert": {
-    "id": "kai-live-fullscreen-20261111-0907",
+    "id": "kai-3h-brief-20261122-0505",
     "hasAlert": true,
-    "timestamp": "11/11/26 • 09:07 BOT",
-    "title": "PRUEBA DE ENLACE DIRECTO KAI • RICHARD & KAI",
-    "hero": "ENLACE TÁCTICO REMOTO ESTABLECIDO CON ÉXITO",
-    "status": "CANAL DE EMERGENCIA 100% OPERATIVO",
-    "summary": "¡Hola Richard, mate! Este es un mensaje directo en tiempo real hacia tu teléfono físico. Si estás viendo esta ventana y sonó la alarma, significa que nuestro motor de enlace táctico remoto 24/7 superó el bloqueo de pantalla con éxito absoluto.",
-    "action": "Presiona el botón 'SILENCIAR' abajo para apagar el sonar y confírmame por el chat que la prueba fue un éxito total.",
-    "priority": "HIGH"
+    "timestamp": "22/11/26 • 05:05 BOT",
+    "title": "INFORME TACTICO 3H: REVISION PORTAFOLIO",
+    "hero": "BTC TESTEA $60K • DEFENSAS SPOT ACTIVAS",
+    "status": "BOVEDA PROTEGIDA • 17 ORDENES VIVAS",
+    "summary": "Richard, mate: BTC oscila en $59,800 buscando suelo. Nuestras 17 ordenes de venta (TPs) permanecen intactas en Binance Spot con $158.70 USDT en reserva defensiva. Cero riesgo de liquidacion. NEAR muestra leve rebote a $2.92 y RENDER fortaleza en $1.33. Mantenemos disciplina absoluta y paciencia institucional.",
+    "action": "Monitoreo continuo activo. No se requieren maniobras forzadas; dejamos que las ordenes limite operen en los libros.",
+    "priority": "MEDIUM"
   },
   "orders": [
     {
